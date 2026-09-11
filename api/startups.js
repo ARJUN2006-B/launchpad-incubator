@@ -21,17 +21,31 @@ router.get('/', (req, res) => {
   res.json({ startups });
 });
 
-// GET /api/startups/my — Current user's startup
+// GET /api/startups/my — Current user's startup (full dashboard data)
 router.get('/my', auth, (req, res) => {
   const startup = dbWrapper.get('SELECT * FROM startups WHERE user_id = ?', [req.user.id]);
   if (!startup) return res.status(404).json({ error: 'No startup found for this user' });
 
   const team = dbWrapper.all('SELECT * FROM startup_team_members WHERE startup_id = ?', [startup.id]);
   const mentor_assignment = dbWrapper.get(
-    `SELECT ma.*, m.name as mentor_name, m.initials, m.role as mentor_role, m.rating, m.expertise, m.bio, m.availability, m.sessions_completed
+    `SELECT ma.*, m.name as mentor_name, m.initials, m.role as mentor_role, m.rating, m.expertise, m.bio, m.availability, m.sessions_completed, m.linkedin
      FROM mentor_assignments ma JOIN mentors m ON ma.mentor_id = m.id
      WHERE ma.startup_id = ? AND ma.is_active = 1`, [startup.id]
   );
+
+  // Include milestones, tasks, documents, and funding in one response
+  const milestones = dbWrapper.all('SELECT * FROM milestones WHERE startup_id = ? ORDER BY created_at ASC', [startup.id]);
+  const milestonesWithTasks = milestones.map(ms => {
+    const tasks = dbWrapper.all('SELECT * FROM milestone_tasks WHERE milestone_id = ? ORDER BY sort_order ASC', [ms.id]);
+    return { ...ms, tasks };
+  });
+
+  const documents = dbWrapper.all('SELECT * FROM documents WHERE startup_id = ? ORDER BY created_at DESC', [startup.id]);
+  const funding = dbWrapper.all('SELECT * FROM funding_applications WHERE startup_id = ? ORDER BY created_at DESC', [startup.id]);
+
+  startup.milestones = milestonesWithTasks;
+  startup.documents = documents;
+  startup.funding = funding;
 
   res.json({ startup, team, mentor: mentor_assignment || null });
 });

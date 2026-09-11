@@ -4,6 +4,9 @@
 
 // 8. INVESTOR HUB
 function renderInvestors() {
+  // Render with whatever is in AppData.investors (loaded from API by startup-api.js)
+  const investors = AppData.investors || [];
+  const interests = AppData.investorInterests || [];
   let html = `
     <div class="page-inner fade-up">
       <div class="page-header"><div class="page-title">Investor Hub</div><div class="page-subtitle">Connect with top VCs and angel investors looking for startups like yours.</div></div>
@@ -12,64 +15,49 @@ function renderInvestors() {
         <div class="inv-filter-panel">
           <div class="doc-search" style="margin-bottom:20px;width:100%">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--txt-muted)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="text" placeholder="Search investors..."/>
+            <input type="text" placeholder="Search investors..." oninput="filterInvestors(this.value)"/>
           </div>
-          
           <div class="filter-section">
             <div class="filter-title">Investment Sector</div>
-            <label class="filter-opt"><input type="checkbox" checked/> AgriTech</label>
-            <label class="filter-opt"><input type="checkbox" checked/> Artificial Intelligence</label>
-            <label class="filter-opt"><input type="checkbox"/> FinTech</label>
-            <label class="filter-opt"><input type="checkbox"/> B2B SaaS</label>
-            <label class="filter-opt"><input type="checkbox"/> DeepTech</label>
+            ${['AgriTech','Artificial Intelligence','FinTech','B2B SaaS','DeepTech'].map(f=>`<label class="filter-opt"><input type="checkbox" checked onchange="filterInvestors()"/> ${f}</label>`).join('')}
           </div>
-          
           <div class="filter-section">
             <div class="filter-title">Funding Stage</div>
-            <label class="filter-opt"><input type="checkbox" checked/> Pre-Seed</label>
-            <label class="filter-opt"><input type="checkbox" checked/> Seed</label>
-            <label class="filter-opt"><input type="checkbox"/> Series A</label>
-            <label class="filter-opt"><input type="checkbox"/> Series B+</label>
-          </div>
-          
-          <div class="filter-section" style="margin-bottom:0">
-            <div class="filter-title">Investor Type</div>
-            <label class="filter-opt"><input type="checkbox" checked/> Venture Capital</label>
-            <label class="filter-opt"><input type="checkbox" checked/> Angel Network</label>
-            <label class="filter-opt"><input type="checkbox"/> Micro VC</label>
+            ${['Pre-Seed','Seed','Series A','Series B+'].map(s=>`<label class="filter-opt"><input type="checkbox" checked/> ${s}</label>`).join('')}
           </div>
         </div>
         
         <div>
+          ${interests.length > 0 ? `
           <div class="card" style="margin-bottom:24px;padding:18px 22px">
             <div style="font-family:'Space Grotesk';font-size:16px;font-weight:700;margin-bottom:6px">Investor Interest</div>
-            <div style="font-size:13px;color:var(--txt-secondary);margin-bottom:14px">Investors who have recently engaged with your profile.</div>
-            <table class="fund-app-table interest-table" style="background:transparent">
+            <div style="font-size:13px;color:var(--txt-secondary);margin-bottom:14px">Investors who have shown interest in your startup.</div>
+            <table class="fund-app-table" style="background:transparent">
               <tbody>
-                <tr><td><div class="inv-logo" style="background:rgba(108,99,255,0.12);color:#6C63FF;width:24px;height:24px;font-size:10px;border-radius:6px">TV</div> <strong>TechVentures</strong></td><td>Viewed Pitch Deck (3x)</td><td>Aug 27</td><td><button class="btn btn-secondary btn-xs" onclick="navigateTo('messages')">Message</button></td></tr>
-                <tr><td><div class="inv-logo" style="background:rgba(0,212,170,0.12);color:#00D4AA;width:24px;height:24px;font-size:10px;border-radius:6px">GC</div> <strong>Green Capital</strong></td><td>Saved Profile</td><td>Aug 23</td><td><button class="btn btn-secondary btn-xs" onclick="showToast('Connection request sent','🤝')">Connect</button></td></tr>
+                ${interests.map(i=>`<tr><td><strong>${i.investor_name||'Investor'}</strong></td><td>${i.investment_type}</td><td>₹${Number(i.proposed_amount||0).toLocaleString('en-IN')}</td><td><span class="tag tag-teal" style="font-size:10px">${i.status}</span></td><td><button class="btn btn-secondary btn-xs" onclick="navigateTo('messages')">Message</button></td></tr>`).join('')}
               </tbody>
             </table>
-          </div>
+          </div>` : ''}
           
-          <div class="inv-cards-grid">
-            ${AppData.investors.map(inv => `
+          <div class="inv-cards-grid" id="invCardsGrid">
+            ${investors.length === 0 ? '<div style="color:var(--txt-secondary);padding:40px 0;text-align:center">No investors available yet.</div>' : 
+            investors.map(inv => `
               <div class="inv-card">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start">
-                  <div class="inv-big-logo" style="background:${inv.bg};color:${inv.color}">${inv.initials}</div>
-                  <span class="tag tag-muted" style="border:1px solid ${inv.statusBg};background:${inv.statusBg};color:${inv.statusColor}">${inv.status}</span>
+                  <div class="inv-big-logo" style="background:${inv.bg||'rgba(108,99,255,0.12)'};color:${inv.color||'#A78BFA'}">${inv.initials||'IN'}</div>
+                  <span class="tag tag-muted">${inv.investor_type||inv.type||'VC'}</span>
                 </div>
                 <div class="inv-name">${inv.name}</div>
-                <div class="inv-type">${inv.type} · ${inv.stage}</div>
+                <div class="inv-type">${inv.investor_type||inv.type||''} · ${inv.preferred_stage||inv.stage||'Any'}</div>
                 <div class="inv-tags">
-                  ${inv.focus.map(f => `<span class="tag tag-muted">${f}</span>`).join('')}
+                  ${(inv.focus||JSON.parse(inv.focus_sectors||'[]')).map(f=>`<span class="tag tag-muted">${f}</span>`).join('')}
                 </div>
                 <div style="font-size:12px;color:var(--txt-secondary);margin-bottom:16px;display:flex;align-items:center;gap:6px">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Check Size: ${inv.range}
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Check Size: ${inv.investment_range_text||inv.range||'N/A'}
                 </div>
                 <div class="inv-actions">
-                  <button class="btn btn-primary btn-sm" style="flex:1" onclick="showToast('Connection request sent','🤝')">Connect</button>
-                  <button class="btn btn-secondary btn-sm" style="flex:1" onclick="showInvestorModal(${inv.id})">Profile</button>
+                  <button class="btn btn-primary btn-sm" style="flex:1" onclick="sendInvestorInterest('${inv.id}','${inv.name}')">Connect</button>
+                  <button class="btn btn-secondary btn-sm" style="flex:1" onclick="showInvestorModal('${inv.id}')">Profile</button>
                 </div>
               </div>
             `).join('')}
@@ -81,33 +69,64 @@ function renderInvestors() {
   document.getElementById('page-investors').innerHTML = html;
 }
 
+// Load investor interest data for startup (called on init)
+window.sendInvestorInterest = async function(invId, invName) {
+  const amount = prompt(`Proposed investment amount from ${invName} (in ₹):`);
+  if (amount === null) return;
+  const msg = prompt('Your message to the investor:');
+  if (msg === null) return;
+  try {
+    await Api.sendMessage(invId, msg || `Hi, I'm the founder of ${AppData.startup.name}. I'd love to connect regarding a potential investment opportunity.`);
+    if (!AppData.investorInterests) AppData.investorInterests = [];
+    AppData.investorInterests.push({ investor_name: invName, investment_type: 'Equity', proposed_amount: parseFloat(amount)||0, status: 'Interested' });
+    showToast(`Connection request sent to ${invName}`, '🤝');
+  } catch(e) { showToast('Failed to send: ' + e.message, '❌'); }
+};
+
 window.showInvestorModal = function(id) {
-  const inv = AppData.investors.find(i => i.id === id);
+  const inv = AppData.investors.find(i => i.id === id || i.id === parseInt(id));
   if(!inv) return;
+  const focus = inv.focus || (typeof inv.focus_sectors === 'string' ? JSON.parse(inv.focus_sectors||'[]') : (inv.focus_sectors||[]));
+  const stage = inv.preferred_stage || inv.stage || 'Any';
+  const range = inv.investment_range_text || inv.range || 'N/A';
+  const type = inv.investor_type || inv.type || 'Investor';
   document.getElementById('invModalTitle').innerText = inv.name;
   document.getElementById('invModalBody').innerHTML = `
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
-      <div class="inv-big-logo" style="background:${inv.bg};color:${inv.color};width:64px;height:64px;font-size:20px">${inv.initials}</div>
+      <div class="inv-big-logo" style="background:${inv.bg||'rgba(108,99,255,0.12)'};color:${inv.color||'#A78BFA'};width:64px;height:64px;font-size:20px">${inv.initials||(inv.name||'IN').substring(0,2).toUpperCase()}</div>
       <div>
         <div style="font-family:'Space Grotesk';font-size:20px;font-weight:700">${inv.name}</div>
-        <div style="font-size:13px;color:var(--txt-secondary)">${inv.type} · ${inv.website}</div>
+        <div style="font-size:13px;color:var(--txt-secondary)">${type} · ${inv.website||''}</div>
       </div>
     </div>
-    <div style="font-size:13.5px;line-height:1.6;margin-bottom:20px">${inv.description}</div>
-    <div class="info-row"><div class="info-label">Investment Range</div><div class="info-value" style="font-weight:600">${inv.range}</div></div>
-    <div class="info-row"><div class="info-label">Preferred Stage</div><div class="info-value">${inv.stage}</div></div>
-    <div class="info-row"><div class="info-label">Portfolio Size</div><div class="info-value">${inv.portfolio} active companies</div></div>
-    <div class="info-row"><div class="info-label">Key Contact</div><div class="info-value">${inv.contact}</div></div>
+    <div style="font-size:13.5px;line-height:1.6;margin-bottom:20px">${inv.description||''}</div>
+    <div class="info-row"><div class="info-label">Investment Range</div><div class="info-value" style="font-weight:600">${range}</div></div>
+    <div class="info-row"><div class="info-label">Preferred Stage</div><div class="info-value">${stage}</div></div>
+    <div class="info-row"><div class="info-label">Portfolio Size</div><div class="info-value">${inv.portfolio||inv.portfolio_count||0} active companies</div></div>
+    <div class="info-row"><div class="info-label">Key Contact</div><div class="info-value">${inv.contact||inv.contact_name||'N/A'}</div></div>
     <div class="section-row" style="margin-top:20px;margin-bottom:10px"><div class="section-label">Focus Areas</div></div>
     <div class="inv-tags" style="margin-bottom:24px">
-      ${inv.focus.map(f => `<span class="tag tag-muted">${f}</span>`).join('')}
+      ${focus.map(f => `<span class="tag tag-muted">${f}</span>`).join('')}
     </div>
     <div class="modal-footer" style="margin-top:0">
       <button class="btn btn-secondary" onclick="closeModal('investorProfileModal')">Close</button>
-      <button class="btn btn-primary" onclick="closeModal('investorProfileModal');showToast('Connection request sent to ${inv.name}','🤝')">Send Connection Request</button>
+      <button class="btn btn-primary" onclick="closeModal('investorProfileModal');sendInvestorInterest('${inv.id}','${inv.name}')">Send Connection Request</button>
     </div>
   `;
   openModal('investorProfileModal');
+};
+
+// Filter investors by search
+window.filterInvestors = function(query) {
+  const q = (query || document.querySelector('#invCardsGrid')?.parentElement?.querySelector('input')?.value || '').toLowerCase();
+  const cards = document.querySelectorAll('#invCardsGrid .inv-card');
+  const investors = AppData.investors || [];
+  cards.forEach((card, i) => {
+    const inv = investors[i];
+    if (!inv) return;
+    const match = !q || inv.name.toLowerCase().includes(q) || (inv.investor_type||'').toLowerCase().includes(q) || (inv.description||'').toLowerCase().includes(q);
+    card.style.display = match ? '' : 'none';
+  });
 };
 
 // 9. MEETINGS PAGE
@@ -226,20 +245,22 @@ function renderMeetings() {
 
 // 10. EVENTS PAGE
 function renderEvents() {
+  const registeredCount = (AppData.events||[]).filter(e => e.registered).length;
   let html = `
     <div class="page-inner fade-up">
-      <div class="page-header"><div class="page-title">Events & Community</div><div class="page-subtitle">Workshops, pitch days, and networking opportunities.</div></div>
+      <div class="page-header"><div class="page-title">Events &amp; Community</div><div class="page-subtitle">Workshops, pitch days, and networking opportunities.</div></div>
       
       <div class="tabs" style="margin-bottom:24px">
-        <button class="tab active">All Events</button>
-        <button class="tab">Workshops</button>
-        <button class="tab">Pitch Days</button>
-        <button class="tab">Investor Meets</button>
-        <button class="tab">Registered (2)</button>
+        <button class="tab active" data-target="ev-all">All Events</button>
+        <button class="tab" data-target="ev-workshop">Workshops</button>
+        <button class="tab" data-target="ev-pitch">Pitch Days</button>
+        <button class="tab" data-target="ev-investor">Investor Meets</button>
+        <button class="tab" data-target="ev-reg">Registered (${registeredCount})</button>
       </div>
       
-      <div class="events-grid">
-        ${AppData.events.map(ev => `
+      <div class="events-grid" id="ev-all">
+        ${(AppData.events||[]).length === 0 ? '<div style="color:var(--txt-secondary);padding:40px 0;text-align:center;grid-column:1/-1">No events available yet.</div>' : ''}
+        ${(AppData.events||[]).map(ev => `
           <div class="event-card">
             <div class="event-banner" style="background:${ev.color}">
               <div class="event-banner-label" style="background:${ev.tagColor};color:#fff">${ev.type}</div>
@@ -256,8 +277,8 @@ function renderEvents() {
               <div class="event-footer">
                 <div class="seats-badge">${ev.seats === 0 ? '<span style="color:var(--red);font-weight:600">Event Full</span>' : (ev.registered ? '<span style="color:var(--teal);font-weight:600">✓ Registered</span>' : `${ev.seats} seats left`)}</div>
                 ${ev.registered 
-                  ? `<button class="btn btn-secondary btn-xs" onclick="showEventModal(${ev.id})">View Details</button>`
-                  : `<button class="btn btn-primary btn-xs" ${ev.seats === 0 ? 'disabled style="opacity:0.5"' : ''} onclick="showEventModal(${ev.id})">Register</button>`
+                  ? `<button class="btn btn-secondary btn-xs" onclick="cancelEventReg('${ev.id}')">Cancel Reg.</button>`
+                  : `<button class="btn btn-primary btn-xs" ${ev.seats === 0 ? 'disabled style="opacity:0.5"' : ''} onclick="registerForEvent('${ev.id}')">${ev.seats === 0 ? 'Full' : 'Register'}</button>`
                 }
               </div>
             </div>
@@ -270,9 +291,10 @@ function renderEvents() {
 }
 
 window.showEventModal = function(id) {
-  const ev = AppData.events.find(e => e.id === id);
+  const ev = AppData.events.find(e => e.id === id || e.id === String(id));
   if(!ev) return;
   document.getElementById('eventModalTitle').innerText = ev.title;
+
   
   let btnText = ev.registered ? 'Cancel Registration' : (ev.seats === 0 ? 'Waitlist' : 'Register Now');
   let btnClass = ev.registered ? 'btn-danger' : 'btn-primary';

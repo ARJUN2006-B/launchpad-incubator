@@ -48,9 +48,9 @@ app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'log
 app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
 app.get('/about', (req, res) => res.sendFile(path.join(__dirname, 'public', 'about.html')));
 app.get('/programs', (req, res) => res.sendFile(path.join(__dirname, 'public', 'programs.html')));
-app.get('/startups-directory', (req, res) => res.sendFile(path.join(__dirname, 'public', 'startups.html')));
-app.get('/mentors-directory', (req, res) => res.sendFile(path.join(__dirname, 'public', 'mentors.html')));
-app.get('/events-directory', (req, res) => res.sendFile(path.join(__dirname, 'public', 'events-public.html')));
+app.get('/startups', (req, res) => res.sendFile(path.join(__dirname, 'public', 'startups.html')));
+app.get('/mentors', (req, res) => res.sendFile(path.join(__dirname, 'public', 'mentors.html')));
+app.get('/events', (req, res) => res.sendFile(path.join(__dirname, 'public', 'events.html')));
 app.get('/contact', (req, res) => res.sendFile(path.join(__dirname, 'public', 'contact.html')));
 
 // Dashboard routes (protected by client-side auth check, server sends HTML)

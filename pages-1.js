@@ -123,9 +123,10 @@ function renderOverview() {
   `).join('');
   document.getElementById('overviewTasks').innerHTML = taskHtml;
   
-  document.getElementById('overviewActivity').innerHTML = AppData.activities.slice(0,4).map(a => `
-    <div class="activity-item"><div class="activity-icon" style="background:${a.bg}">${a.icon}</div><div class="activity-body"><div class="activity-text">${a.text}</div><div class="activity-time">${a.time}</div></div></div>
-  `).join('');
+  const actItems = (AppState.activity && AppState.activity.length ? AppState.activity : (AppData.activities||[])).slice(0,5);
+  document.getElementById('overviewActivity').innerHTML = actItems.map(a => `
+    <div class="activity-item"><div class="activity-icon" style="background:${a.bg||'rgba(108,99,255,0.12)'}">${a.icon||'📋'}</div><div class="activity-body"><div class="activity-text">${a.text}</div><div class="activity-time">${a.time}</div></div></div>
+  `).join('') || '<div style="color:var(--txt-secondary);font-size:13px;padding:8px 0">No recent activity yet.</div>';
   
   document.getElementById('overviewMeetings').innerHTML = AppState.meetings.filter(m => !m.past).slice(0,3).map(m => `
     <div class="meeting-item"><div class="meeting-date-box"><div class="meeting-mo">${m.month}</div><div class="meeting-dy">${m.day}</div></div><div class="meeting-info"><div class="meeting-time-txt">${m.time} · ${m.type}</div><div class="meeting-title-txt">${m.title}</div><div class="meeting-with-txt">${m.with}</div></div><button class="join-btn" onclick="showToast('Meeting joined','📹')">Join</button></div>
@@ -153,7 +154,7 @@ function renderStartup() {
   const data = AppData.startup;
   let html = `
     <div class="page-inner fade-up">
-      <div class="page-header-row"><div class="page-header"><div class="page-title">My Startup</div><div class="page-subtitle">Manage your startup profile and team details.</div></div><button class="btn btn-primary" onclick="showToast('Profile updated successfully','✅')">Save Changes</button></div>
+      <div class="page-header-row"><div class="page-header"><div class="page-title">My Startup</div><div class="page-subtitle">Manage your startup profile and team details.</div></div><button class="btn btn-primary" onclick="saveStartupProfile()">Save Changes</button></div>
       
       <div class="startup-grid">
         <div class="card">
@@ -162,24 +163,24 @@ function renderStartup() {
             <div style="width:72px;height:72px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--teal));display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;font-family:'Space Grotesk'">${data.logo}</div>
             <div><button class="btn btn-secondary btn-sm" onclick="document.getElementById('logoUpload').click()">Change Logo</button><input type="file" id="logoUpload" style="display:none"/><div style="font-size:11px;color:var(--txt-secondary);margin-top:6px">Recommended: 400x400px</div></div>
           </div>
-          <div class="form-row"><div class="form-group"><label class="form-label">Startup Name</label><input class="form-input" value="${data.name}"/></div><div class="form-group"><label class="form-label">Founded Date</label><input class="form-input" value="${data.founded}"/></div></div>
-          <div class="form-group"><label class="form-label">Tagline</label><input class="form-input" value="${data.tagline}"/></div>
-          <div class="form-row"><div class="form-group"><label class="form-label">Industry</label><input class="form-input" value="${data.industry}"/></div><div class="form-group"><label class="form-label">Startup Stage</label><select class="form-select"><option>Idea</option><option>Prototype</option><option selected>MVP Development</option><option>Market Testing</option><option>Growth</option></select></div></div>
-          <div class="form-row"><div class="form-group"><label class="form-label">Location</label><input class="form-input" value="${data.location}"/></div><div class="form-group"><label class="form-label">Website</label><input class="form-input" value="${data.website}"/></div></div>
+          <div class="form-row"><div class="form-group"><label class="form-label">Startup Name</label><input class="form-input" id="startupName" value="${data.name}"/></div><div class="form-group"><label class="form-label">Founded Date</label><input class="form-input" id="startupFounded" value="${data.founded||''}"/></div></div>
+          <div class="form-group"><label class="form-label">Tagline</label><input class="form-input" id="startupTagline" value="${data.tagline}"/></div>
+          <div class="form-row"><div class="form-group"><label class="form-label">Industry</label><input class="form-input" id="startupIndustry" value="${data.industry}"/></div><div class="form-group"><label class="form-label">Startup Stage</label><select class="form-select" id="startupStage"><option ${data.stage==='Idea'?'selected':''}>Idea</option><option ${data.stage==='Prototype'?'selected':''}>Prototype</option><option ${data.stage==='MVP Development'?'selected':''}>MVP Development</option><option ${data.stage==='Market Validation'?'selected':''}>Market Validation</option><option ${data.stage==='Scaling'?'selected':''}>Scaling</option></select></div></div>
+          <div class="form-row"><div class="form-group"><label class="form-label">Location</label><input class="form-input" id="startupLocation" value="${data.location}"/></div><div class="form-group"><label class="form-label">Website</label><input class="form-input" id="startupWebsite" value="${data.website}"/></div></div>
         </div>
         
         <div style="display:flex;flex-direction:column;gap:22px">
           <div class="card">
             <div class="section-row"><div class="section-label">Core Hypothesis</div></div>
-            <div class="form-group"><label class="form-label">Problem Statement</label><textarea class="form-textarea">${data.problem}</textarea></div>
-            <div class="form-group" style="margin-bottom:0"><label class="form-label">Proposed Solution</label><textarea class="form-textarea">${data.solution}</textarea></div>
+            <div class="form-group"><label class="form-label">Problem Statement</label><textarea class="form-textarea" id="startupProblem">${data.problem||''}</textarea></div>
+            <div class="form-group" style="margin-bottom:0"><label class="form-label">Proposed Solution</label><textarea class="form-textarea" id="startupSolution">${data.solution||''}</textarea></div>
           </div>
           <div class="card">
             <div class="section-row"><div class="section-label">Business Information</div></div>
-            <div class="form-group"><label class="form-label">Business Model</label><textarea class="form-textarea" style="min-height:60px">${data.businessModel}</textarea></div>
-            <div class="form-group"><label class="form-label">Target Customers</label><input class="form-input" value="${data.targetCustomers}"/></div>
-            <div class="form-group"><label class="form-label">Revenue Model</label><input class="form-input" value="${data.revenueModel}"/></div>
-            <div class="form-group" style="margin-bottom:0"><label class="form-label">Market Size</label><input class="form-input" value="${data.marketSize}"/></div>
+            <div class="form-group"><label class="form-label">Business Model</label><textarea class="form-textarea" style="min-height:60px" id="startupBusinessModel">${data.businessModel||''}</textarea></div>
+            <div class="form-group"><label class="form-label">Target Customers</label><input class="form-input" id="startupTargetCustomers" value="${data.targetCustomers||''}"/></div>
+            <div class="form-group"><label class="form-label">Revenue Model</label><input class="form-input" id="startupRevenueModel" value="${data.revenueModel||''}"/></div>
+            <div class="form-group" style="margin-bottom:0"><label class="form-label">Market Size</label><input class="form-input" id="startupMarketSize" value="${data.marketSize||''}"/></div>
           </div>
         </div>
       </div>
@@ -192,18 +193,19 @@ function renderStartup() {
   `;
   document.getElementById('page-startup').innerHTML = html;
   
-  // Render Team
-  const teamHtml = AppState.teamMembers.map((m, i) => `
+  // Render Team — use AppData.team (updated by backend)
+  const teamSource = AppData.team && AppData.team.length ? AppData.team : (AppState.teamMembers||[]);
+  const teamHtml = teamSource.map((m, i) => `
     <div class="team-card">
       <div class="team-av" style="background:${m.color}22;color:${m.color};border:1px solid ${m.color}44">${m.initials}</div>
       <div class="team-name">${m.name}</div>
       <div class="team-role">${m.role}</div>
       <div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-bottom:14px">
-        ${m.skills.map(s => `<span class="tag tag-muted">${s}</span>`).join('')}
+        ${(m.skills||[]).map(s => `<span class="tag tag-muted">${s}</span>`).join('')}
       </div>
-      <button class="btn btn-secondary btn-xs" style="width:100%" onclick="removeTeamMember(${i})">Remove</button>
+      <button class="btn btn-secondary btn-xs" style="width:100%" onclick="removeTeamMember('${m.id||i}')">Remove</button>
     </div>
-  `).join('');
+  `).join('') || '<div style="color:var(--txt-secondary);font-size:13px;padding:12px 0">No team members yet.</div>';
   document.getElementById('teamGridRender').innerHTML = teamHtml;
 }
 

@@ -1,19 +1,28 @@
 # LaunchPad — Online Startup Incubator Platform
 
-LaunchPad is a comprehensive, production-ready full-stack web application designed to manage an online startup incubator. It provides dedicated portals for four distinct roles: Founders, Mentors, Investors, and Administrators.
+LaunchPad is a comprehensive, production-ready full-stack web application designed to manage an online startup incubator. It provides dedicated portals for four distinct roles: Founders, Mentors, Investors, and Administrators, alongside a set of dynamic public pages to showcase the ecosystem.
 
 ## Features
 
-*   **🚀 Startup Founder Dashboard**: Mission control for startups to track incubation progress, upload pitch decks, book mentoring sessions, and discover funding opportunities.
-*   **🎓 Mentor Dashboard**: Allows mentors to manage assigned startups, review milestone submissions, provide structured feedback, and track upcoming meetings.
-*   **💼 Investor Hub**: Enables investors to discover startups by stage and industry, manage a personalized watchlist, and submit formal investment interests.
-*   **⚙️ Admin Operations Console**: Provides high-level platform analytics, application review workflows, mentor assignment, and global incubation oversight.
+### Public Portal
+*   **Landing Page**: A stunning, premium homepage highlighting the incubator's mission.
+*   **Programs Directory**: Live showcase of 4 flagship incubator programs (IdeaLab, Core, ScaleUp, Global Accelerator) with equity, funding details, and FAQ.
+*   **Startup Portfolio**: A dynamic directory of active startups equipped with real-time search, industry filtering, and performance stats.
+*   **Mentor Network**: A grid of industry-leading mentors with expertise tags, ratings, and a recruitment CTA.
+*   **Events Calendar**: Real-time event registration (workshops, pitch days, networking) with seat availability tracking and one-click registration.
+*   **About Us**: Mission, values, history timeline, and team profiles.
+
+### Authenticated Dashboards
+*   **🚀 Startup Founder**: Mission control for startups to track incubation progress across 7 milestones, upload pitch decks, book mentoring sessions, and discover funding opportunities.
+*   **🎓 Mentor**: Allows mentors to manage assigned startups, review milestone submissions, provide structured feedback, and track upcoming meetings.
+*   **💼 Investor Hub**: Enables investors to discover startups by stage and industry, manage a personalized watchlist, and submit formal investment interests directly to founders.
+*   **⚙️ Admin Operations Console**: Provides high-level platform analytics, application review workflows, mentor assignments, and global incubation oversight.
 
 ## Technology Stack
 
 *   **Backend:** Node.js with Express
-*   **Database:** SQLite (using `sql.js` for zero-configuration portability)
-*   **Authentication:** JWT-based role authentication
+*   **Database:** SQLite (using `sql.js` for zero-configuration portability with an in-memory db that syncs to disk)
+*   **Authentication:** JWT-based role authentication via `localStorage`
 *   **Frontend:** Pure HTML/CSS/JS featuring a custom-built premium design system (glassmorphism, fluid animations, dark-mode aesthetic) without the overhead of heavy frontend frameworks.
 
 ## Getting Started
@@ -27,7 +36,7 @@ LaunchPad is a comprehensive, production-ready full-stack web application design
 
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/your-username/launchpad-incubator.git
+    git clone https://github.com/ARJUN2006-B/launchpad-incubator.git
     cd launchpad-incubator
     ```
 
@@ -36,7 +45,7 @@ LaunchPad is a comprehensive, production-ready full-stack web application design
     npm install
     ```
 
-3.  Start the server:
+3.  Start the server (this will automatically initialize and seed the database if it doesn't exist):
     ```bash
     npm start
     ```
@@ -54,12 +63,12 @@ The database is pre-seeded with demo data. You can log in using the following ac
 
 ## Project Structure
 
-*   `/api`: Express route handlers for the REST API
-*   `/db`: Database initialization, schema, and seeding scripts
+*   `/api`: Express route handlers for the REST API endpoints (auth, startups, mentors, events, funding, etc.)
+*   `/db`: Database initialization, schema definition, and seeding scripts
 *   `/middleware`: Authentication and authorization middleware
-*   `/public`: Public-facing static assets (landing page, login, register, shared JS/CSS)
-*   `/dashboards`: Role-specific dashboard HTML files and specialized scripts
-*   `server.js`: Main Express application entry point
+*   `/public`: Public-facing dynamic HTML pages, shared CSS, client-side API wrappers (`api.js`)
+*   `/dashboards`: Role-specific dashboard HTML files, logic (`app.js`), and specialized sub-views
+*   `server.js`: Main Express application entry point, route registration, and static file serving
 
 ## License
 

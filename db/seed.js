@@ -40,7 +40,7 @@ function seedIfEmpty() {
 
   // ── USERS ──
   const users = [
-    { id: IDS.startupUser, email: 'startup@launchpad.demo', password_hash: DEMO_PASSWORD_HASH, full_name: 'Arjun Sharma', phone: '+91 98765 43210', role: 'startup' },
+    { id: IDS.startupUser, email: 'startup@launchpad.demo', password_hash: DEMO_PASSWORD_HASH, full_name: 'Arjun', phone: '+91 98765 43210', role: 'startup' },
     { id: IDS.mentorUser, email: 'mentor@launchpad.demo', password_hash: DEMO_PASSWORD_HASH, full_name: 'Dr. Rahul Mehta', phone: '+91 99887 76655', role: 'mentor' },
     { id: IDS.investorUser, email: 'investor@launchpad.demo', password_hash: DEMO_PASSWORD_HASH, full_name: 'Vikram Bajaj', phone: '+91 98001 12345', role: 'investor' },
     { id: IDS.adminUser, email: 'admin@launchpad.demo', password_hash: DEMO_PASSWORD_HASH, full_name: 'LaunchPad Admin', phone: '+91 80-4567-8901', role: 'admin' },
@@ -134,7 +134,7 @@ function seedIfEmpty() {
 
   // ── TEAM MEMBERS for NovaSphere ──
   const teamMembers = [
-    { startup_id: IDS.startup1, name: 'Arjun Sharma', role: 'Founder & CEO', skills: JSON.stringify(['Product Strategy', 'AI/ML', 'Business Development']), color: '#6C63FF', initials: 'AS' },
+    { startup_id: IDS.startup1, name: 'Arjun', role: 'Founder & CEO', skills: JSON.stringify(['Product Strategy', 'AI/ML', 'Business Development']), color: '#6C63FF', initials: 'A' },
     { startup_id: IDS.startup1, name: 'Priya Nair', role: 'CTO', skills: JSON.stringify(['Machine Learning', 'Python', 'AWS']), color: '#00D4AA', initials: 'PN' },
     { startup_id: IDS.startup1, name: 'Rohit Verma', role: 'Lead Designer', skills: JSON.stringify(['UI/UX', 'Figma', 'User Research']), color: '#FFB830', initials: 'RV' },
     { startup_id: IDS.startup1, name: 'Kavya Singh', role: 'Growth Lead', skills: JSON.stringify(['Marketing', 'Content', 'SEO']), color: '#FF7A50', initials: 'KS' },
@@ -452,7 +452,7 @@ function seedIfEmpty() {
     { user_id: IDS.startupUser, type: 'investor', icon: '👁', title: 'Investor viewed your deck', text: 'Green Capital viewed your pitch deck 3 times this week.', link: '#investors', is_read: 1 },
     // Mentor notifications
     { user_id: IDS.mentorUser, type: 'milestone', icon: '🚀', title: 'Milestone submitted for review', text: 'NovaSphere has submitted MVP Development milestone for your review.', link: 'milestones', is_read: 0 },
-    { user_id: IDS.mentorUser, type: 'meeting', icon: '📅', title: 'Meeting request from NovaSphere', text: 'Arjun Sharma has requested a mentor session for Sep 12 at 4:00 PM.', link: 'meetings', is_read: 0 },
+    { user_id: IDS.mentorUser, type: 'meeting', icon: '📅', title: 'Meeting request from NovaSphere', text: 'Arjun has requested a mentor session for Sep 12 at 4:00 PM.', link: 'meetings', is_read: 0 },
     // Admin notifications
     { user_id: IDS.adminUser, type: 'application', icon: '📋', title: 'New incubation application', text: 'A new startup application has been submitted and requires review.', link: 'applications', is_read: 0 },
     { user_id: IDS.adminUser, type: 'funding', icon: '💰', title: 'Funding application pending review', text: 'DST-NIDHI PRAYAS funding application from NovaSphere requires your review.', link: 'funding', is_read: 0 },
