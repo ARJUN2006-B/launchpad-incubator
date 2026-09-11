@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard — LaunchPad</title>
+  <meta name="description" content="Admin dashboard — manage startups, mentors, applications, and platform operations."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="/js/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#07090F;--bg2:#0D1421;--bg3:#111927;--accent:#6C63FF;--teal:#00D4AA;--orange:#FF7A50;--gold:#FFB830;--red:#FF4D6A;--purple:#A78BFA;--txt:#EDF1FA;--txt2:#7B89A0;--txt3:#4A5568;--border:rgba(255,255,255,0.07);--radius:16px;--radius-sm:10px;--sw:72px;--swexp:240px;--tr:0.25s cubic-bezier(0.4,0,0.2,1);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow:hidden;}
+button{font-family:inherit;cursor:pointer;} input,textarea,select{font-family:inherit;outline:none;} a{text-decoration:none;color:inherit;}
+::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-thumb{background:rgba(255,77,106,0.3);border-radius:8px;}
+.app{display:flex;min-height:100vh;}
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:20px 0 16px;position:fixed;top:0;left:0;bottom:0;width:var(--sw);z-index:100;transition:width var(--tr);overflow:hidden;}
+.sidebar.exp{width:var(--swexp);align-items:flex-start;}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:0 18px 22px;width:100%;border-bottom:1px solid var(--border);margin-bottom:14px;}
+.logo-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--red),var(--orange));display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo-text{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;white-space:nowrap;background:linear-gradient(to right,#fff,var(--red));-webkit-background-clip:text;-webkit-text-fill-color:transparent;opacity:0;transition:opacity var(--tr);}
+.sidebar.exp .logo-text{opacity:1;}
+.sb-role-badge{padding:0 18px 14px;width:100%;}
+.sb-role-badge span{display:none;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--red);background:rgba(255,77,106,0.1);border:1px solid rgba(255,77,106,0.2);border-radius:100px;padding:4px 10px;}
+.sidebar.exp .sb-role-badge span{display:inline;}
+.sb-nav{flex:1;width:100%;display:flex;flex-direction:column;gap:2px;padding:0 8px;overflow-y:auto;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;white-space:nowrap;overflow:hidden;transition:all var(--tr);position:relative;}
+.nav-item:hover{background:rgba(255,77,106,0.07);}
+.nav-item .ni{flex-shrink:0;width:20px;height:20px;color:var(--txt2);transition:color var(--tr);}
+.nav-item .nl{font-size:13.5px;font-weight:500;color:var(--txt2);opacity:0;transition:opacity var(--tr);}
+.sidebar.exp .nl{opacity:1;}
+.nav-item:hover .ni,.nav-item:hover .nl{color:var(--txt);}
+.nav-item.active{background:linear-gradient(90deg,rgba(255,77,106,0.12),transparent);}
+.nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(to bottom,var(--red),var(--orange));}
+.nav-item.active .ni,.nav-item.active .nl{color:var(--red);}
+.nb{margin-left:auto;background:var(--red);color:#07090F;font-size:10px;font-weight:700;border-radius:20px;padding:2px 6px;opacity:0;transition:opacity var(--tr);}
+.sidebar.exp .nb{opacity:1;}
+.sb-bottom{width:100%;border-top:1px solid var(--border);padding:10px 8px 0;display:flex;flex-direction:column;gap:2px;}
+.sb-av{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;overflow:hidden;}
+.sb-av:hover{background:rgba(255,255,255,0.05);}
+.av-img{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--orange));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;}
+.av-info{opacity:0;transition:opacity var(--tr);}
+.sidebar.exp .av-info{opacity:1;}
+.av-name{font-size:12px;font-weight:600;}
+.av-role{font-size:10px;color:var(--txt2);}
+.sb-toggle{position:fixed;top:20px;left:calc(var(--sw) - 14px);width:24px;height:24px;background:var(--bg3);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:101;transition:left var(--tr);color:var(--txt2);}
+.sb-toggle:hover{background:rgba(255,77,106,0.1);color:var(--red);}
+.sb-toggle.exp{left:calc(var(--swexp) - 14px);}
+.sb-toggle svg{transition:transform var(--tr);}
+.sb-toggle.exp svg{transform:rotate(180deg);}
+.main{flex:1;margin-left:var(--sw);height:100vh;overflow:hidden;display:flex;flex-direction:column;transition:margin-left var(--tr);}
+.main.exp{margin-left:var(--swexp);}
+.topbar{height:58px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;padding:0 24px;flex-shrink:0;background:rgba(7,9,15,0.8);backdrop-filter:blur(20px);}
+.topbar-title{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;flex:1;}
+.icon-btn{width:36px;height:36px;border-radius:var(--radius-sm);background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--txt2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;}
+.icon-btn:hover{background:rgba(255,77,106,0.08);color:var(--red);}
+.content{flex:1;overflow-y:auto;padding:24px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;}
+.card-sm{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.ph{margin-bottom:24px;}
+.ph h1{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;margin-bottom:4px;}
+.ph p{font-size:13.5px;color:var(--txt2);}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;}
+.sc-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px;}
+.sc-num{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;margin-bottom:4px;}
+.sc-label{font-size:12px;color:var(--txt2);}
+.btn{font-size:13px;font-weight:600;border-radius:var(--radius-sm);padding:9px 18px;border:none;cursor:pointer;font-family:inherit;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:linear-gradient(135deg,var(--red),var(--orange));color:#fff;box-shadow:0 4px 16px rgba(255,77,106,0.3);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(255,77,106,0.4);}
+.btn-secondary{background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--txt);}
+.btn-secondary:hover{background:rgba(255,255,255,0.08);}
+.btn-sm{font-size:12px;padding:7px 14px;}
+.btn-xs{font-size:11px;padding:5px 10px;}
+.tabs{display:flex;gap:4px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);padding:4px;margin-bottom:20px;}
+.tab{font-size:13px;font-weight:500;padding:8px 16px;border-radius:8px;border:none;background:transparent;color:var(--txt2);cursor:pointer;transition:all 0.2s;}
+.tab.active{background:rgba(255,77,106,0.12);color:var(--red);}
+.tc{display:none;}
+.tc.active{display:block;}
+.tag{font-size:11px;font-weight:600;border-radius:6px;padding:3px 8px;}
+.tag-red{background:rgba(255,77,106,0.12);color:var(--red);}
+.tag-gold{background:rgba(255,184,48,0.12);color:var(--gold);}
+.tag-teal{background:rgba(0,212,170,0.12);color:var(--teal);}
+.tag-accent{background:rgba(108,99,255,0.12);color:var(--purple);}
+.tag-muted{background:rgba(255,255,255,0.06);color:var(--txt2);}
+.form-group{margin-bottom:16px;}
+label.lbl{display:block;font-size:11.5px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+input.inp, select.inp, textarea.inp{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--txt);font-size:13.5px;border-radius:var(--radius-sm);padding:11px 14px;transition:border-color 0.2s;}
+input.inp:focus,select.inp:focus,textarea.inp:focus{border-color:var(--red);}
+textarea.inp{resize:vertical;min-height:80px;}
+select.inp option{background:var(--bg2);}
+table{width:100%;border-collapse:collapse;}
+th{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--txt3);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);}
+td{font-size:13.5px;padding:13px 14px;border-bottom:1px solid rgba(255,255,255,0.04);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,0.02);}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;width:90%;max-width:520px;max-height:90vh;overflow-y:auto;}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.modal-title{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;}
+.modal-close{background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--txt);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;}
+#toastContainer{position:fixed;bottom:24px;right:24px;z-index:300;display:flex;flex-direction:column;gap:10px;}
+.toast{background:rgba(13,20,33,0.95);border:1px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;min-width:240px;backdrop-filter:blur(20px);box-shadow:0 8px 24px rgba(0,0,0,0.4);animation:slideIn 0.3s;font-size:13.5px;}
+@keyframes slideIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+.fade-up{animation:fadeUp 0.5s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-logo">
+      <div class="logo-mark"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+      <span class="logo-text">LaunchPad</span>
+    </div>
+    <div class="sb-role-badge"><span>⚙️ Admin</span></div>
+    <nav class="sb-nav" id="sbNav">
+      <div class="nav-item active" data-page="overview"><svg class="ni" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span class="nl">Overview</span></div>
+      <div class="nav-item" data-page="applications"><svg class="ni" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span class="nl">Applications</span><span class="nb" id="badge-apps">0</span></div>
+      <div class="nav-item" data-page="startups"><svg class="ni" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m12 8 4 4"/></svg><span class="nl">Startups</span></div>
+      <div class="nav-item" data-page="mentors"><svg class="ni" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nl">Mentors</span></div>
+      <div class="nav-item" data-page="investors"><svg class="ni" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg><span class="nl">Investors</span></div>
+      <div class="nav-item" data-page="funding"><svg class="ni" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span class="nl">Funding</span></div>
+      <div class="nav-item" data-page="events"><svg class="ni" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg><span class="nl">Events</span></div>
+    </nav>
+    <div class="sb-bottom">
+      <div class="sb-av">
+        <div class="av-img" id="avImg">AD</div>
+        <div class="av-info"><div class="av-name" id="avName">Admin</div><div class="av-role">Operations</div></div>
+      </div>
+      <div class="nav-item" onclick="doLogout()"><svg class="ni" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span class="nl">Logout</span></div>
+    </div>
+  </aside>
+
+  <button class="sb-toggle" id="sbToggle" onclick="toggleSidebar()"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+
+  <main class="main" id="mainArea">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Overview</div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <input class="inp" id="globalSearch" placeholder="Global search..." style="background:rgba(255,255,255,0.04);width:200px" onkeypress="if(event.key==='Enter')doSearch()"/>
+        <button class="icon-btn" onclick="doLogout()" title="Logout">→</button>
+      </div>
+    </div>
+    <div class="content" id="content">
+      <div style="display:flex;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--txt2)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+        Loading admin dashboard...
+      </div>
+    </div>
+  </main>
+
+  <div id="toastContainer"></div>
+
+  <!-- Review App Modal -->
+  <div class="overlay" id="appModal">
+    <div class="modal">
+      <div class="modal-header"><div class="modal-title">Review Application</div><button class="modal-close" onclick="closeModal('appModal')">✕</button></div>
+      <div id="appModalBody">
+        <input type="hidden" id="appId"/>
+        <div class="info-row"><div class="info-label">Startup Name</div><div class="info-value" id="appName">--</div></div>
+        <div class="info-row"><div class="info-label">Founder</div><div class="info-value" id="appFounder">--</div></div>
+        <div class="form-group" style="margin-top:16px"><label class="lbl">Admin Notes</label><textarea class="inp" id="appNotes" rows="3"></textarea></div>
+        <div class="form-group"><label class="lbl">Update Status</label><select class="inp" id="appStatus"><option value="submitted">Submitted</option><option value="under_review">Under Review</option><option value="interview">Interview Scheduled</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select></div>
+        <div class="form-group" id="mentorAssignGroup" style="display:none"><label class="lbl">Assign Mentor (if approved)</label><select class="inp" id="appMentorSel"></select></div>
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px"><button class="btn btn-secondary" onclick="closeModal('appModal')">Cancel</button><button class="btn btn-primary" onclick="submitAppReview()">Save Review</button></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  let DASH = {};
+  let APPS = [];
+  let STARTUPS = [];
+  let MENTORS = [];
+  let INVESTORS = [];
+  let EVENTS = [];
+
+  const PAGE_TITLES = {overview:'Overview',applications:'Applications',startups:'Startups Management',mentors:'Mentors Management',investors:'Investors Management',funding:'Funding Management',events:'Events Management'};
+
+  async function init() {
+    const user = Api.requireAuth(['admin']);
+    if (!user) return;
+    document.getElementById('avImg').textContent = (user.name||'AD').substring(0,2).toUpperCase();
+    document.getElementById('avName').textContent = user.name.split(' ')[0];
+
+    try {
+      DASH = await Api.getAdminDashboard().catch(()=>({stats:{},recentStartups:[],recentApplications:[]}));
+      
+      const [appData, sData, mData, iData, eData] = await Promise.all([
+        Api.getAdminApplications().catch(()=>({applications:[]})),
+        Api.getAdminStartups().catch(()=>({startups:[]})),
+        Api.getAdminMentors().catch(()=>({mentors:[]})),
+        Api.getAdminInvestors().catch(()=>({investors:[]})),
+        Api.getEvents().catch(()=>({events:[]}))
+      ]);
+      APPS = appData.applications||[];
+      STARTUPS = sData.startups||[];
+      MENTORS = mData.mentors||[];
+      INVESTORS = iData.investors||[];
+      EVENTS = eData.events||[];
+
+      const pending = APPS.filter(a=>['submitted','under_review'].includes(a.status)).length;
+      const b = document.getElementById('badge-apps');
+      b.textContent = pending;
+      b.style.display = pending > 0 ? '' : 'none';
+
+    } catch(e) {}
+    goPage('overview');
+  }
+
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('exp');
+    document.getElementById('sbToggle').classList.toggle('exp');
+    document.getElementById('mainArea').classList.toggle('exp');
+  }
+
+  function goPage(page) {
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.page === page));
+    document.getElementById('topbarTitle').textContent = PAGE_TITLES[page] || page;
+    renderPage(page);
+  }
+
+  document.getElementById('sbNav').addEventListener('click', e => {
+    const item = e.target.closest('.nav-item');
+    if (item && item.dataset.page) goPage(item.dataset.page);
+  });
+
+  async function doLogout() { await Api.logout(); window.location.href = '/login'; }
+
+  function renderPage(page) {
+    const content = document.getElementById('content');
+    content.innerHTML = `<div style="text-align:center;padding:60px;color:var(--txt2)"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></div>`;
+    switch(page) {
+      case 'overview': renderOverview(); break;
+      case 'applications': renderApps(); break;
+      case 'startups': renderStartups(); break;
+      case 'mentors': renderMentors(); break;
+      case 'investors': renderInvestors(); break;
+      case 'events': renderEvents(); break;
+      default: content.innerHTML = '<div style="padding:40px;color:var(--txt2)">Coming soon</div>';
+    }
+  }
+
+  function renderOverview() {
+    const s = DASH.stats || {};
+    document.getElementById('content').innerHTML = `
+      <div class="fade-up">
+        <div class="ph"><h1>Incubator Operations ⚙️</h1><p>Platform metrics and quick actions.</p></div>
+        <div class="grid-4" style="margin-bottom:24px">
+          <div class="stat-card"><div class="sc-icon" style="background:rgba(108,99,255,0.12);color:var(--accent)">🚀</div><div class="sc-num">${s.activeStartups||0}</div><div class="sc-label">Active Startups</div></div>
+          <div class="stat-card"><div class="sc-icon" style="background:rgba(255,184,48,0.12);color:var(--gold)">📋</div><div class="sc-num">${s.pendingApplications||0}</div><div class="sc-label">Pending Apps</div></div>
+          <div class="stat-card"><div class="sc-icon" style="background:rgba(0,212,170,0.12);color:var(--teal)">🎓</div><div class="sc-num">${s.totalMentors||0}</div><div class="sc-label">Mentors</div></div>
+          <div class="stat-card"><div class="sc-icon" style="background:rgba(255,77,106,0.12);color:var(--red)">💰</div><div class="sc-num">₹${((s.fundingReleased||0)/100000).toFixed(1)}L</div><div class="sc-label">Funding Released</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div style="font-size:14px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between"><span>Recent Applications</span><a href="#" onclick="goPage('applications')" style="font-size:12px;color:var(--red)">View All</a></div>
+            ${(DASH.recentApplications||[]).slice(0,5).map(a=>`
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+                <div><div style="font-size:13.5px;font-weight:600">${a.startup_name||'Draft'}</div><div style="font-size:12px;color:var(--txt2)">${a.founder_name||''}</div></div>
+                <span class="tag tag-${a.status==='approved'?'teal':a.status==='submitted'?'gold':'muted'}">${a.status}</span>
+              </div>
+            `).join('')||'<div style="color:var(--txt2);font-size:13px">No recent apps</div>'}
+          </div>
+          <div class="card">
+            <div style="font-size:14px;font-weight:700;margin-bottom:14px">Platform Usage</div>
+            <div style="height:220px;position:relative"><canvas id="adminChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+    `;
+    setTimeout(()=>{
+      const ctx = document.getElementById('adminChart');
+      if(ctx) {
+        new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Startups', 'Mentors', 'Investors'],
+            datasets: [{
+              data: [s.totalStartups||0, s.totalMentors||0, s.totalInvestors||0],
+              backgroundColor: ['#6C63FF', '#00D4AA', '#FFB830'],
+              borderWidth: 0,
+              cutout: '75%'
+            }]
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#EDF1FA', font:{family:'Inter'} } } } }
+        });
+      }
+    }, 100);
+  }
+
+  function renderApps() {
+    const sColors = {draft:'var(--txt2)',submitted:'var(--gold)',under_review:'var(--orange)',interview:'var(--purple)',approved:'var(--teal)',rejected:'var(--red)'};
+    document.getElementById('content').innerHTML = `
+      <div class="fade-up">
+        <div class="ph"><h1>Applications</h1><p>Review and approve incoming startup incubation requests.</p></div>
+        <div class="card" style="padding:0;overflow:hidden">
+          <table>
+            <thead><tr><th>Startup</th><th>Founder</th><th>Status</th><th>Submitted</th><th>Actions</th></tr></thead>
+            <tbody>
+              ${APPS.length===0?'<tr><td colspan="5" style="text-align:center;color:var(--txt2)">No applications found</td></tr>':''}
+              ${APPS.map(a => `
+                <tr>
+                  <td><strong>${a.startup_name||'—'}</strong></td>
+                  <td>${a.founder_name||'—'}</td>
+                  <td><span style="font-size:11px;font-weight:700;background:${sColors[a.status]}22;color:${sColors[a.status]};border-radius:6px;padding:3px 8px;text-transform:capitalize">${a.status.replace('_',' ')}</span></td>
+                  <td>${a.submitted_at?new Date(a.submitted_at).toLocaleDateString('en-IN'):'—'}</td>
+                  <td><button class="btn btn-primary btn-xs" onclick="openAppModal('${a.id}','${a.startup_name}','${a.founder_name}','${a.status}')">Review</button></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderStartups() {
+    document.getElementById('content').innerHTML = `
+      <div class="fade-up">
+        <div class="ph"><h1>Startups</h1><p>Manage all incubated startups.</p></div>
+        <div class="card" style="padding:0;overflow:hidden">
+          <table>
+            <thead><tr><th>Startup</th><th>Industry</th><th>Stage</th><th>Cohort</th><th>Status</th></tr></thead>
+            <tbody>
+              ${STARTUPS.map(s => `
+                <tr>
+                  <td><div style="font-weight:600">${s.name}</div><div style="font-size:11px;color:var(--txt2)">${s.founder_name}</div></td>
+                  <td>${s.industry||''}</td>
+                  <td><span class="tag tag-accent">${s.stage||'MVP'}</span></td>
+                  <td>${s.cohort||'—'}</td>
+                  <td><span class="tag tag-${s.incubation_status==='active'?'teal':s.incubation_status==='graduated'?'gold':'muted'}">${s.incubation_status}</span></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderMentors() {
+    document.getElementById('content').innerHTML = `
+      <div class="fade-up">
+        <div class="ph"><h1>Mentors</h1><p>Manage mentor network.</p></div>
+        <div class="grid-4">
+          ${MENTORS.map(m => `
+            <div class="card-sm" style="text-align:center">
+              <div style="width:48px;height:48px;border-radius:50%;background:rgba(0,212,170,0.12);color:var(--teal);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700">${m.full_name.substring(0,2).toUpperCase()}</div>
+              <div style="font-weight:600;font-size:14px;margin-bottom:4px">${m.full_name}</div>
+              <div style="font-size:12px;color:var(--txt2);margin-bottom:12px">${m.role||'Mentor'}</div>
+              <div style="font-size:11px;font-weight:600;color:var(--accent)">${m.assigned_count||0} Startups Assigned</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderInvestors() {
+    document.getElementById('content').innerHTML = `
+      <div class="fade-up">
+        <div class="ph"><h1>Investors</h1><p>Manage investor network and verify accounts.</p></div>
+        <div class="card" style="padding:0;overflow:hidden">
+          <table>
+            <thead><tr><th>Organization</th><th>Investor Name</th><th>Type</th><th>Verified</th><th>Action</th></tr></thead>
+            <tbody>
+              ${INVESTORS.map(i => `
+                <tr>
+                  <td><strong>${i.organization||'—'}</strong></td>
+                  <td>${i.name||'—'}</td>
+                  <td>${i.investor_type||'—'}</td>
+                  <td>${i.is_verified?'<span class="tag tag-teal">Verified</span>':'<span class="tag tag-muted">Pending</span>'}</td>
+                  <td>
+                    ${!i.is_verified ? `<button class="btn btn-primary btn-xs" onclick="verifyInv('${i.id}',true)">Verify</button>` : `<button class="btn btn-secondary btn-xs" onclick="verifyInv('${i.id}',false)">Unverify</button>`}
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderEvents() {
+    document.getElementById('content').innerHTML = `
+      <div class="fade-up">
+        <div class="ph"><h1>Events</h1><p>Manage platform events.</p></div>
+        <div class="grid-3">
+          ${EVENTS.map(ev => `
+            <div class="card-sm">
+              <div style="font-size:24px;margin-bottom:8px">${ev.emoji||'📅'}</div>
+              <div style="font-weight:600;font-size:14px;margin-bottom:4px">${ev.title}</div>
+              <div style="font-size:12px;color:var(--txt2);margin-bottom:12px">${ev.event_date}</div>
+              <div style="font-size:11px;font-weight:600;background:rgba(255,255,255,0.06);padding:4px 8px;border-radius:6px;display:inline-block">${ev.registered_count||0} / ${ev.capacity} Registered</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // ── ACTIONS ──
+
+  function openAppModal(id, name, founder, status) {
+    document.getElementById('appId').value = id;
+    document.getElementById('appName').textContent = name;
+    document.getElementById('appFounder').textContent = founder;
+    document.getElementById('appStatus').value = status;
+    document.getElementById('appStatus').onchange = (e) => {
+      document.getElementById('mentorAssignGroup').style.display = e.target.value === 'approved' ? 'block' : 'none';
+    };
+    if (MENTORS.length > 0) {
+      document.getElementById('appMentorSel').innerHTML = `<option value="">None (Assign later)</option>` + MENTORS.map(m=>`<option value="${m.id}">${m.full_name} (${m.role||'Mentor'})</option>`).join('');
+    }
+    document.getElementById('mentorAssignGroup').style.display = status === 'approved' ? 'block' : 'none';
+    document.getElementById('appModal').classList.add('open');
+  }
+
+  async function submitAppReview() {
+    const id = document.getElementById('appId').value;
+    const status = document.getElementById('appStatus').value;
+    const notes = document.getElementById('appNotes').value;
+    const mentor_id = document.getElementById('appMentorSel').value;
+    try {
+      await Api.reviewApplication(id, { status, admin_notes: notes, mentor_id });
+      showToast('Application updated', '✅');
+      closeModal('appModal');
+      init(); // refresh all
+    } catch(e) { showToast('Error: '+e.message, '❌'); }
+  }
+
+  async function verifyInv(id, verified) {
+    try {
+      await Api.verifyInvestor(id, verified);
+      showToast(verified?'Investor verified':'Investor unverified', '✅');
+      init();
+    } catch(e) { showToast('Error: '+e.message, '❌'); }
+  }
+
+  async function doSearch() {
+    const q = document.getElementById('globalSearch').value;
+    if(!q || q.length<2) return;
+    try {
+      const res = await Api.globalSearch(q);
+      const r = res.results;
+      let html = `<div class="ph"><h1>Search Results for "${q}"</h1></div><div class="grid-2">`;
+      if(r.startups?.length) html += `<div class="card"><div style="font-weight:700;margin-bottom:10px">Startups</div>${r.startups.map(s=>`<div>${s.name} <span class="tag tag-muted">${s.industry}</span></div>`).join('')}</div>`;
+      if(r.mentors?.length) html += `<div class="card"><div style="font-weight:700;margin-bottom:10px">Mentors</div>${r.mentors.map(m=>`<div>${m.name} <span class="tag tag-muted">${m.role}</span></div>`).join('')}</div>`;
+      if(r.events?.length) html += `<div class="card"><div style="font-weight:700;margin-bottom:10px">Events</div>${r.events.map(e=>`<div>${e.name}</div>`).join('')}</div>`;
+      html += `</div>`;
+      if(!r.startups?.length && !r.mentors?.length && !r.events?.length) html += `<div class="card">No results found</div>`;
+      document.getElementById('content').innerHTML = `<div class="fade-up">${html}</div>`;
+    } catch(e) { showToast('Search failed','❌'); }
+  }
+
+  function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
+  document.addEventListener('click', e => { if(e.target.classList.contains('overlay')) e.target.classList.remove('open'); });
+
+  function showToast(msg, icon='✅') {
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.innerHTML = `<span style="font-size:18px">${icon}</span>${msg}`;
+    document.getElementById('toastContainer').appendChild(t);
+    setTimeout(()=>t.remove(), 4000);
+  }
+
+  init();
+  </script>
+</body>
+</html>

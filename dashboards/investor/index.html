@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Investor Dashboard — LaunchPad</title>
+  <meta name="description" content="Investor dashboard — discover, track, and connect with the best Indian startups."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="/js/api.js"></script>
+<style>
+:root{--bg:#07090F;--bg2:#0D1421;--bg3:#111927;--accent:#6C63FF;--teal:#00D4AA;--orange:#FF7A50;--gold:#FFB830;--red:#FF4D6A;--purple:#A78BFA;--txt:#EDF1FA;--txt2:#7B89A0;--txt3:#4A5568;--border:rgba(255,255,255,0.07);--radius:16px;--radius-sm:10px;--sw:72px;--swexp:240px;--tr:0.25s cubic-bezier(0.4,0,0.2,1);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow:hidden;}
+button{font-family:inherit;cursor:pointer;} input,textarea,select{font-family:inherit;outline:none;} a{text-decoration:none;color:inherit;}
+::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-thumb{background:rgba(255,184,48,0.3);border-radius:8px;}
+.app{display:flex;min-height:100vh;}
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:20px 0 16px;position:fixed;top:0;left:0;bottom:0;width:var(--sw);z-index:100;transition:width var(--tr);overflow:hidden;}
+.sidebar.exp{width:var(--swexp);align-items:flex-start;}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:0 18px 22px;width:100%;border-bottom:1px solid var(--border);margin-bottom:14px;}
+.logo-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--gold),var(--orange));display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo-text{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;white-space:nowrap;background:linear-gradient(to right,#fff,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;opacity:0;transition:opacity var(--tr);}
+.sidebar.exp .logo-text{opacity:1;}
+.sb-role-badge{padding:0 18px 14px;width:100%);}
+.sb-role-badge span{display:none;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gold);background:rgba(255,184,48,0.1);border:1px solid rgba(255,184,48,0.2);border-radius:100px;padding:4px 10px;}
+.sidebar.exp .sb-role-badge span{display:inline;}
+.sb-nav{flex:1;width:100%;display:flex;flex-direction:column;gap:2px;padding:0 8px;overflow-y:auto;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;white-space:nowrap;overflow:hidden;transition:all var(--tr);position:relative;}
+.nav-item:hover{background:rgba(255,184,48,0.07);}
+.nav-item .ni{flex-shrink:0;width:20px;height:20px;color:var(--txt2);transition:color var(--tr);}
+.nav-item .nl{font-size:13.5px;font-weight:500;color:var(--txt2);opacity:0;transition:opacity var(--tr);}
+.sidebar.exp .nl{opacity:1;}
+.nav-item:hover .ni,.nav-item:hover .nl{color:var(--txt);}
+.nav-item.active{background:linear-gradient(90deg,rgba(255,184,48,0.12),transparent);}
+.nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(to bottom,var(--gold),var(--orange));}
+.nav-item.active .ni,.nav-item.active .nl{color:var(--gold);}
+.nb{margin-left:auto;background:var(--gold);color:#07090F;font-size:10px;font-weight:700;border-radius:20px;padding:2px 6px;opacity:0;transition:opacity var(--tr);}
+.sidebar.exp .nb{opacity:1;}
+.sb-bottom{width:100%;border-top:1px solid var(--border);padding:10px 8px 0;display:flex;flex-direction:column;gap:2px;}
+.sb-av{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;overflow:hidden;}
+.sb-av:hover{background:rgba(255,255,255,0.05);}
+.av-img{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--orange));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;}
+.av-info{opacity:0;transition:opacity var(--tr);}
+.sidebar.exp .av-info{opacity:1;}
+.av-name{font-size:12px;font-weight:600;}
+.av-role{font-size:10px;color:var(--txt2);}
+.sb-toggle{position:fixed;top:20px;left:calc(var(--sw) - 14px);width:24px;height:24px;background:var(--bg3);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:101;transition:left var(--tr);color:var(--txt2);}
+.sb-toggle:hover{background:rgba(255,184,48,0.1);color:var(--gold);}
+.sb-toggle.exp{left:calc(var(--swexp) - 14px);}
+.sb-toggle svg{transition:transform var(--tr);}
+.sb-toggle.exp svg{transform:rotate(180deg);}
+.main{flex:1;margin-left:var(--sw);height:100vh;overflow:hidden;display:flex;flex-direction:column;transition:margin-left var(--tr);}
+.main.exp{margin-left:var(--swexp);}
+.topbar{height:58px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;padding:0 24px;flex-shrink:0;background:rgba(7,9,15,0.8);backdrop-filter:blur(20px);}
+.topbar-title{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;flex:1;}
+.icon-btn{width:36px;height:36px;border-radius:var(--radius-sm);background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--txt2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;}
+.icon-btn:hover{background:rgba(255,184,48,0.08);color:var(--gold);}
+.content{flex:1;overflow-y:auto;padding:24px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;}
+.card-sm{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.ph{margin-bottom:24px;}
+.ph h1{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;margin-bottom:4px;}
+.ph p{font-size:13.5px;color:var(--txt2);}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;}
+.sc-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px;}
+.sc-num{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;margin-bottom:4px;}
+.sc-label{font-size:12px;color:var(--txt2);}
+/* Startup opportunity card */
+.opp-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:22px;transition:all 0.25s;}
+.opp-card:hover{border-color:rgba(255,184,48,0.25);transform:translateY(-3px);box-shadow:0 16px 32px rgba(0,0,0,0.3);}
+.opp-logo{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;font-family:'Space Grotesk',sans-serif;margin-bottom:14px;}
+.opp-name{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;margin-bottom:4px;}
+.opp-tagline{font-size:13px;color:var(--txt2);margin-bottom:14px;line-height:1.5;}
+.prog-track{height:5px;background:rgba(255,255,255,0.05);border-radius:100px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--gold),var(--orange));}
+.opp-footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px;}
+.tag{font-size:11px;font-weight:600;border-radius:6px;padding:3px 8px;}
+.tag-gold{background:rgba(255,184,48,0.12);color:var(--gold);}
+.tag-teal{background:rgba(0,212,170,0.12);color:var(--teal);}
+.tag-accent{background:rgba(108,99,255,0.12);color:var(--purple);}
+.tag-orange{background:rgba(255,122,80,0.12);color:var(--orange);}
+.tag-muted{background:rgba(255,255,255,0.06);color:var(--txt2);}
+.btn{font-size:13px;font-weight:600;border-radius:var(--radius-sm);padding:9px 18px;border:none;cursor:pointer;font-family:inherit;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--orange));color:#fff;box-shadow:0 4px 16px rgba(255,184,48,0.3);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(255,184,48,0.4);}
+.btn-secondary{background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--txt);}
+.btn-secondary:hover{background:rgba(255,255,255,0.08);}
+.btn-sm{font-size:12px;padding:7px 14px;}
+.btn-xs{font-size:11px;padding:5px 10px;}
+.tabs{display:flex;gap:4px;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);padding:4px;margin-bottom:20px;}
+.tab{font-size:13px;font-weight:500;padding:8px 16px;border-radius:8px;border:none;background:transparent;color:var(--txt2);cursor:pointer;transition:all 0.2s;}
+.tab.active{background:rgba(255,184,48,0.12);color:var(--gold);}
+.tc{display:none;}
+.tc.active{display:block;}
+.info-row{display:flex;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.info-label{font-size:12px;color:var(--txt2);width:140px;flex-shrink:0;}
+.info-value{font-size:13px;font-weight:500;}
+.form-group{margin-bottom:16px;}
+label.lbl{display:block;font-size:11.5px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+input.inp, select.inp, textarea.inp{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--txt);font-size:13.5px;border-radius:var(--radius-sm);padding:11px 14px;transition:border-color 0.2s;}
+input.inp:focus,select.inp:focus,textarea.inp:focus{border-color:var(--gold);}
+textarea.inp{resize:vertical;min-height:80px;}
+select.inp option{background:var(--bg2);}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;width:90%;max-width:520px;max-height:90vh;overflow-y:auto;}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.modal-title{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;}
+.modal-close{background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--txt);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;}
+#toastContainer{position:fixed;bottom:24px;right:24px;z-index:300;display:flex;flex-direction:column;gap:10px;}
+.toast{background:rgba(13,20,33,0.95);border:1px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;min-width:240px;backdrop-filter:blur(20px);box-shadow:0 8px 24px rgba(0,0,0,0.4);animation:slideIn 0.3s;font-size:13.5px;}
+@keyframes slideIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+.fade-up{animation:fadeUp 0.5s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.opps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;}
+.heart-btn{background:none;border:none;cursor:pointer;font-size:18px;color:var(--txt3);transition:color 0.2s;}
+.heart-btn.saved{color:var(--red);}
+</style>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-logo">
+      <div class="logo-mark"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+      <span class="logo-text">LaunchPad</span>
+    </div>
+    <div class="sb-role-badge"><span>💼 Investor</span></div>
+    <nav class="sb-nav" id="sbNav">
+      <div class="nav-item active" data-page="overview"><svg class="ni" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span class="nl">Overview</span></div>
+      <div class="nav-item" data-page="opportunities"><svg class="ni" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><span class="nl">Discover Startups</span></div>
+      <div class="nav-item" data-page="watchlist"><svg class="ni" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span class="nl">Watchlist</span><span class="nb" id="badge-wl">0</span></div>
+      <div class="nav-item" data-page="interests"><svg class="ni" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span class="nl">My Interests</span><span class="nb" id="badge-int">0</span></div>
+      <div class="nav-item" data-page="meetings"><svg class="ni" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg><span class="nl">Meetings</span></div>
+      <div class="nav-item" data-page="messages"><svg class="ni" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="nl">Messages</span></div>
+      <div class="nav-item" data-page="events"><svg class="ni" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg><span class="nl">Events</span></div>
+      <div class="nav-item" data-page="profile"><svg class="ni" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="nl">My Profile</span></div>
+    </nav>
+    <div class="sb-bottom">
+      <div class="sb-av" onclick="goPage('profile')">
+        <div class="av-img" id="avImg">VB</div>
+        <div class="av-info"><div class="av-name" id="avName">Loading...</div><div class="av-role">Investor</div></div>
+      </div>
+      <div class="nav-item" onclick="doLogout()"><svg class="ni" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span class="nl">Logout</span></div>
+    </div>
+  </aside>
+
+  <button class="sb-toggle" id="sbToggle" onclick="toggleSidebar()"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+
+  <main class="main" id="mainArea">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Overview</div>
+      <div style="display:flex;gap:10px">
+        <button class="icon-btn" onclick="goPage('opportunities')" title="Discover">🔍</button>
+        <button class="icon-btn" onclick="doLogout()" title="Logout">→</button>
+      </div>
+    </div>
+    <div class="content" id="content">
+      <div style="display:flex;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--txt2)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+        Loading investor dashboard...
+      </div>
+    </div>
+  </main>
+
+  <!-- Interest Modal -->
+  <div class="overlay" id="interestModal">
+    <div class="modal">
+      <div class="modal-header"><div class="modal-title">💼 Show Investment Interest</div><button class="modal-close" onclick="closeModal('interestModal')">✕</button></div>
+      <div id="intModalBody">
+        <div class="form-group"><label class="lbl">Startup</label><input class="inp" id="intStartupName" readonly/></div>
+        <input type="hidden" id="intStartupId"/>
+        <div class="form-group"><label class="lbl">Proposed Amount (₹)</label><input class="inp" type="number" id="intAmount" placeholder="e.g. 5000000"/></div>
+        <div class="form-group"><label class="lbl">Investment Type</label><select class="inp" id="intType"><option>Equity</option><option>SAFE</option><option>Convertible Note</option><option>Revenue-Based</option></select></div>
+        <div class="form-group"><label class="lbl">Message to Founder</label><textarea class="inp" id="intMessage" rows="4" placeholder="Introduce yourself and explain your interest..."></textarea></div>
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px">
+          <button class="btn btn-secondary" onclick="closeModal('interestModal')">Cancel</button>
+          <button class="btn btn-primary" onclick="submitInterest()">Send Interest →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer"></div>
+
+  <script>
+  let INVESTOR_PROFILE = null;
+  let ALL_STARTUPS = [];
+  let WATCHLIST = [];
+  let INTERESTS = [];
+  let MEETINGS = [];
+  let CONVS = [];
+  let activeConvId = null;
+
+  const PAGE_TITLES = {overview:'Overview',opportunities:'Discover Startups',watchlist:'Watchlist',interests:'My Interests',meetings:'Meetings',messages:'Messages',events:'Events',profile:'My Profile'};
+
+  async function init() {
+    const user = Api.requireAuth(['investor']);
+    if (!user) return;
+
+    const initials = user.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+    document.getElementById('avImg').textContent = initials;
+    document.getElementById('avName').textContent = user.name.split(' ')[0];
+
+    try {
+      const [profileData, startupsData, watchlistData, interestsData, meetingsData] = await Promise.all([
+        Api.getInvestorProfile().catch(() => ({investor: null})),
+        Api.getOpportunities().catch(() => ({startups: []})),
+        Api.getWatchlist().catch(() => ({watchlist: []})),
+        Api.getMyInterests().catch(() => ({interests: []})),
+        Api.getMeetings().catch(() => ({meetings: []}))
+      ]);
+
+      INVESTOR_PROFILE = profileData.investor;
+      ALL_STARTUPS = startupsData.startups || [];
+      WATCHLIST = watchlistData.watchlist || [];
+      INTERESTS = interestsData.interests || [];
+      MEETINGS = meetingsData.meetings || [];
+
+      document.getElementById('badge-wl').textContent = WATCHLIST.length;
+      document.getElementById('badge-int').textContent = INTERESTS.length;
+    } catch(e) {}
+
+    goPage('overview');
+  }
+
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('exp');
+    document.getElementById('sbToggle').classList.toggle('exp');
+    document.getElementById('mainArea').classList.toggle('exp');
+  }
+
+  function goPage(page) {
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.page === page));
+    document.getElementById('topbarTitle').textContent = PAGE_TITLES[page] || page;
+    renderPage(page);
+  }
+
+  document.getElementById('sbNav').addEventListener('click', e => {
+    const item = e.target.closest('.nav-item');
+    if (item && item.dataset.page) goPage(item.dataset.page);
+  });
+
+  async function doLogout() { await Api.logout(); window.location.href = '/login'; }
+
+  async function renderPage(page) {
+    const content = document.getElementById('content');
+    content.innerHTML = `<div style="text-align:center;padding:60px;color:var(--txt2)"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></div>`;
+    switch(page) {
+      case 'overview': renderOverview(); break;
+      case 'opportunities': renderOpportunities(); break;
+      case 'watchlist': renderWatchlist(); break;
+      case 'interests': renderInterests(); break;
+      case 'meetings': renderMeetings(); break;
+      case 'messages': await renderMessages(); break;
+      case 'events': await renderEvents(); break;
+      case 'profile': renderProfile(); break;
+    }
+  }
+
+  function renderOverview() {
+    const user = Api.getUser();
+    document.getElementById('content').innerHTML = `
+      <div class="fade-up">
+        <div class="ph"><h1>Welcome, ${user?.name?.split(' ')[0]||'Investor'} 💼</h1><p>Your investment activity at a glance.</p></div>
+        <div class="grid-4" style="margin-bottom:24px">
+          <div class="stat-card"><div class="sc-icon" style="background:rgba(255,184,48,0.12)">🔍</div><div class="sc-num">${ALL_STARTUPS.length}</div><div class="sc-label">Startups Available</div></div>
+          <div class="stat-card"><div class="sc-icon" style="background:rgba(255,77,106,0.12)">❤️</div><div class="sc-num">${WATCHLIST.length}</div><div class="sc-label">Watchlisted</div></div>
+          <div class="stat-card"><div class="sc-icon" style="background:rgba(0,212,170,0.12)">💼</div><div class="sc-num">${INTERESTS.length}</div><div class="sc-label">Active Interests</div></div>
+          <div class="stat-card"><div class="sc-icon" style="background:rgba(108,99,255,0.12)">📅</div><div class="sc-num">${MEETINGS.filter(m=>m.status!=='completed').length}</div><div class="sc-label">Meetings Scheduled</div></div>
+        </div>
+        <div class="grid-2">
+          <div>
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--txt2);margin-bottom:14px">Latest Opportunities</div>
+            ${ALL_STARTUPS.slice(0,4).map(s => `
+              <div class="card-sm" style="margin-bottom:12px;display:flex;align-items:center;gap:14px;cursor:pointer" onclick="goPage('opportunities')">
+                <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,184,48,0.12);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;font-family:'Space Grotesk',sans-serif;flex-shrink:0">${(s.logo||s.name.substring(0,2)).toUpperCase()}</div>
+                <div style="flex:1">
+                  <div style="font-size:14px;font-weight:700;margin-bottom:2px">${s.name}</div>
+                  <div style="font-size:12px;color:var(--txt2)">${s.industry||''} · ${s.stage||''}</div>
+                </div>
+                <div style="text-align:right"><div style="font-size:16px;font-weight:700;color:var(--gold)">${s.progress||0}%</div><div style="font-size:10px;color:var(--txt2)">Progress</div></div>
+              </div>
+            `).join('')}
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--txt2);margin-bottom:14px">My Active Interests</div>
+            ${INTERESTS.length === 0 ? '<div style="padding:40px;text-align:center;color:var(--txt2);font-size:13px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius)">No active investment interests yet.<br/><button class="btn btn-primary" style="margin-top:12px" onclick="goPage(\'opportunities\')">Discover Startups</button></div>' :
+            INTERESTS.slice(0,4).map(i => `
+              <div class="card-sm" style="margin-bottom:10px;display:flex;align-items:center;gap:12px">
+                <div style="font-size:20px">${i.logo||'🚀'}</div>
+                <div style="flex:1"><div style="font-size:13.5px;font-weight:600">${i.startup_name}</div><div style="font-size:12px;color:var(--txt2)">${i.industry||''}</div></div>
+                <span style="font-size:11px;font-weight:700;background:rgba(0,212,170,0.12);color:var(--teal);border-radius:6px;padding:3px 8px">${i.status||'Interested'}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderOpportunities() {
+    const watchedIds = new Set(WATCHLIST.map(w => w.id));
+    document.getElementById('content').innerHTML = `
+      <div class="fade-up">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+          <div class="ph" style="margin:0"><h1>Discover Startups</h1><p>${ALL_STARTUPS.length} opportunities from Cohort 2024-B</p></div>
+          <div style="display:flex;gap:10px">
+            <input class="inp" id="searchOpps" placeholder="Search startups..." style="width:220px;background:rgba(255,255,255,0.04);border:1px solid var(--border)" oninput="filterOpps()"/>
+            <select class="inp" id="filterStage" onchange="filterOpps()" style="width:140px;background:rgba(255,255,255,0.04);border:1px solid var(--border)">
+              <option value="">All Stages</option>
+              <option>Idea</option><option>Prototype</option><option>MVP Development</option><option>Market Validation</option><option>Scaling</option>
+            </select>
+          </div>
+        </div>
+        <div class="opps-grid" id="oppsGrid">
+          ${ALL_STARTUPS.map(s => {
+            const isWatched = watchedIds.has(s.id);
+            return `<div class="opp-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div class="opp-logo" style="background:rgba(255,184,48,0.12);color:var(--gold)">${(s.logo||s.name.substring(0,2)).toUpperCase()}</div>
+                <button class="heart-btn ${isWatched?'saved':''}" id="heart-${s.id}" onclick="toggleWatch('${s.id}',this)">♥</button>
+              </div>
+              <div class="opp-name">${s.name}</div>
+              <div class="opp-tagline">${s.tagline||s.industry}</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+                <span class="tag tag-gold">${s.stage||'MVP'}</span>
+                <span class="tag tag-muted">${(s.industry||'').split('/')[0].trim()}</span>
+                <span class="tag tag-muted">Cohort ${s.cohort||'2024-B'}</span>
+              </div>
+              <div style="font-size:12px;color:var(--txt2);margin-bottom:8px">Progress</div>
+              <div class="prog-track" style="margin-bottom:16px"><div class="prog-fill" style="width:${s.progress||0}%"></div></div>
+              <div class="opp-footer">
+                <button class="btn btn-secondary btn-sm" onclick="toggleWatch('${s.id}',document.getElementById('heart-${s.id}'))">${isWatched?'❤️ Saved':'🤍 Save'}</button>
+                <button class="btn btn-primary btn-sm" onclick="openInterest('${s.id}','${s.name}')">Show Interest</button>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  function filterOpps() {
+    const q = (document.getElementById('searchOpps')?.value||'').toLowerCase();
+    const stage = document.getElementById('filterStage')?.value||'';
+    document.querySelectorAll('.opp-card').forEach((card, i) => {
+      const s = ALL_STARTUPS[i];
+      const match = (!q || s.name.toLowerCase().includes(q) || (s.industry||'').toLowerCase().includes(q) || (s.tagline||'').toLowerCase().includes(q))
+                 && (!stage || s.stage === stage);
+      card.style.display = match ? '' : 'none';
+    });
+  }
+
+  function renderWatchlist() {
+    document.getElementById('content').innerHTML = `
+      <div class="fade-up">
+        <div class="ph"><h1>Watchlist</h1><p>Startups you've saved for closer tracking.</p></div>
+        ${WATCHLIST.length === 0 ? '<div class="card" style="text-align:center;padding:60px;color:var(--txt2)">No saved startups yet.<br/><button class="btn btn-primary" style="margin-top:12px" onclick="goPage(\'opportunities\')">Discover Startups</button></div>' :
+        `<div class="opps-grid">
+          ${WATCHLIST.map(s => `
+            <div class="opp-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div class="opp-logo" style="background:rgba(255,184,48,0.12);color:var(--gold)">${(s.logo||s.name.substring(0,2)).toUpperCase()}</div>
+                <button class="heart-btn saved" onclick="toggleWatch('${s.id}',this)">♥</button>
+              </div>
+              <div class="opp-name">${s.name}</div>
+              <div class="opp-tagline">${s.tagline||''}</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+                <span class="tag tag-gold">${s.stage||'MVP'}</span>
+              </div>
+              <div class="prog-track" style="margin-bottom:16px"><div class="prog-fill" style="width:${s.progress||0}%"></div></div>
+              <div class="opp-footer">
+                <span style="font-size:11px;color:var(--txt2)">Added ${s.created_at ? new Date(s.created_at).toLocaleDateString('en-IN') : ''}</span>
+                <button class="btn btn-primary btn-sm" onclick="openInterest('${s.id}','${s.name}')">Show Interest</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>`}
+      </div>
+    `;
+  }
+
+  function renderInterests() {
+    const statusColors = {interested:'var(--gold)',contacted:'var(--orange)',meeting:'var(--accent)',due_diligence:'var(--purple)',invested:'var(--teal)',declined:'var(--red)'};
+    document.getElementById('content').innerHTML = `
+      <div class="fade-up">
+        <div class="ph"><h1>My Interests</h1><p>Investment interests you've shown in incubated startups.</p></div>
+        ${INTERESTS.length === 0 ? '<div class="card" style="text-align:center;padding:60px;color:var(--txt2)">No investment interests yet.</div>' :
+        `<div class="card" style="padding:0;overflow:hidden">
+          <table>
+            <thead><tr><th>Startup</th><th>Industry</th><th>Stage</th><th>Status</th><th>Amount</th><th>Actions</th></tr></thead>
+            <tbody>
+              ${INTERESTS.map(i => `
+                <tr>
+                  <td><strong>${i.startup_name}</strong></td>
+                  <td style="color:var(--txt2)">${i.industry||''}</td>
+                  <td><span class="tag tag-gold">${i.stage||''}</span></td>
+                  <td><span style="font-size:11px;font-weight:700;background:${statusColors[i.status]||'rgba(255,255,255,0.06)'}22;color:${statusColors[i.status]||'var(--txt2)'};border-radius:6px;padding:3px 8px;text-transform:capitalize">${(i.status||'interested').replace('_',' ')}</span></td>
+                  <td>${i.proposed_amount ? '₹'+Number(i.proposed_amount).toLocaleString('en-IN') : '—'}</td>
+                  <td><button class="btn btn-secondary btn-xs" onclick="showToast('Opening conversation...','💬')">Message</button></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>`}
+      </div>
+    `;
+  }
+
+  function renderMeetings() {
+    const upcoming = MEETINGS.filter(m => m.status !== 'completed');
+    const past = MEETINGS.filter(m => m.status === 'completed');
+    document.getElementById('content').innerHTML = `
+      <div class="fade-up">
+        <div class="ph"><h1>Meetings</h1><p>Your scheduled and past meetings with founders.</p></div>
+        <div class="tabs" id="mtgTabs">
+          <button class="tab active" data-target="upcoming">Upcoming (${upcoming.length})</button>
+          <button class="tab" data-target="past">Past (${past.length})</button>
+        </div>
+        <div id="upcoming" class="tc active">
+          ${upcoming.map(m => `
+            <div class="card-sm" style="margin-bottom:12px;display:flex;align-items:center;gap:16px">
+              <div style="background:rgba(255,184,48,0.1);border-radius:10px;padding:10px;text-align:center;min-width:56px">
+                <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase">${(m.meeting_date||'').split(' ')[0]}</div>
+                <div style="font-size:22px;font-weight:800;font-family:'Space Grotesk',sans-serif">${(m.meeting_date||'').split(' ')[1]||'—'}</div>
+              </div>
+              <div style="flex:1"><div style="font-size:15px;font-weight:700;margin-bottom:3px">${m.title}</div><div style="font-size:12.5px;color:var(--txt2)">${m.startup_name||m.participant_name||''} · ${m.meeting_time||''}</div></div>
+              <button class="btn btn-primary btn-sm" onclick="showToast('Joining meeting...','📹')">Join</button>
+            </div>
+          `).join('') || '<div style="padding:40px;text-align:center;color:var(--txt2)">No upcoming meetings</div>'}
+        </div>
+        <div id="past" class="tc">
+          ${past.map(m => `<div class="card-sm" style="margin-bottom:10px;opacity:0.75"><div style="font-size:14px;font-weight:600;margin-bottom:4px">${m.title}</div><div style="font-size:12.5px;color:var(--txt2)">${m.meeting_date||''} · ${m.startup_name||''}</div></div>`).join('') || '<div style="padding:40px;text-align:center;color:var(--txt2)">No past meetings</div>'}
+        </div>
+      </div>
+    `;
+    initTabs();
+  }
+
+  async function renderMessages() {
+    try { const d = await Api.getConversations(); CONVS = d.conversations || []; } catch(e){}
+    if (!activeConvId && CONVS.length > 0) activeConvId = CONVS[0].id;
+    const user = Api.getUser();
+    const activeConv = CONVS.find(c=>c.id===activeConvId);
+    let messages = [];
+    if (activeConv) { try { const d = await Api.getMessages(activeConvId); messages = d.messages||[]; } catch(e){} }
+
+    document.getElementById('content').innerHTML = `
+      <div class="fade-up" style="display:flex;gap:20px;height:calc(100vh - 106px)">
+        <div style="width:260px;flex-shrink:0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column">
+          <div style="padding:12px;border-bottom:1px solid var(--border)"><input class="inp" placeholder="Search..." style="background:rgba(255,255,255,0.04)"/></div>
+          <div style="flex:1;overflow-y:auto">
+            ${CONVS.map(c => {
+              const name = c.participant_one_id===user?.id ? c.p2_name : c.p1_name;
+              const initials = (name||'UN').substring(0,2).toUpperCase();
+              return `<div style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.03);cursor:pointer;background:${c.id===activeConvId?'rgba(255,184,48,0.06)':''};display:flex;align-items:center;gap:10px" onclick="loadConv('${c.id}')">
+                <div style="width:34px;height:34px;border-radius:50%;background:rgba(255,184,48,0.12);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${initials}</div>
+                <div style="flex:1;overflow:hidden"><div style="font-size:13px;font-weight:600">${name||'User'}</div><div style="font-size:11.5px;color:var(--txt2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.last_message||''}</div></div>
+                ${(c.unread_count||0)>0?`<div style="background:var(--gold);color:#07090F;font-size:10px;font-weight:700;border-radius:20px;padding:2px 6px">${c.unread_count}</div>`:''}
+              </div>`;
+            }).join('') || '<div style="padding:20px;text-align:center;font-size:13px;color:var(--txt2)">No conversations yet</div>'}
+          </div>
+        </div>
+        <div style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;overflow:hidden">
+          ${activeConv ? `
+            <div style="padding:14px 20px;border-bottom:1px solid var(--border)">
+              <div style="font-size:14px;font-weight:700">${(activeConv.participant_one_id===user?.id?activeConv.p2_name:activeConv.p1_name)||'User'}</div>
+              <div style="font-size:11px;color:var(--txt2)">${(activeConv.participant_one_id===user?.id?activeConv.p2_role:activeConv.p1_role)||''}</div>
+            </div>
+            <div id="msgBox" style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:10px">
+              ${messages.map(m => {
+                const isMe = m.sender_id===user?.id;
+                return `<div style="display:flex;flex-direction:${isMe?'row-reverse':'row'};gap:8px">
+                  <div style="max-width:70%;background:${isMe?'linear-gradient(135deg,var(--gold),var(--orange))':'rgba(255,255,255,0.06)'};color:${isMe?'#fff':'var(--txt)'};border-radius:${isMe?'16px 16px 4px 16px':'16px 16px 16px 4px'};padding:10px 14px;font-size:13.5px">${m.text}</div>
+                </div>`;
+              }).join('')}
+            </div>
+            <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:10px">
+              <input class="inp" id="invChatInput" placeholder="Type a message..." style="flex:1" onkeypress="if(event.key==='Enter')sendMsg()"/>
+              <button class="btn btn-primary" onclick="sendMsg()">Send</button>
+            </div>
+          ` : '<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--txt2)">Select a conversation</div>'}
+        </div>
+      </div>
+    `;
+    if(activeConv) setTimeout(()=>{const b=document.getElementById('msgBox');if(b)b.scrollTop=b.scrollHeight;},50);
+  }
+
+  async function renderEvents() {
+    const [evData, regData] = await Promise.all([Api.getEvents().catch(()=>({events:[]})), Api.getMyEventRegistrations().catch(()=>({registrations:[]}))]);
+    const events = evData.events || [];
+    const regIds = new Set((regData.registrations||[]).map(r=>r.id));
+
+    document.getElementById('content').innerHTML = `
+      <div class="fade-up">
+        <div class="ph"><h1>Events</h1><p>Investor meets, pitch days, and networking opportunities.</p></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px">
+          ${events.map(ev => {
+            const isReg = regIds.has(ev.id);
+            const spots = Math.max(0, ev.capacity - ev.registered_count);
+            return `<div class="card" style="padding:0;overflow:hidden">
+              <div style="background:${ev.color||'rgba(255,184,48,0.15)'};padding:30px;text-align:center;font-size:32px">${ev.emoji||'📅'}</div>
+              <div style="padding:18px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+                  <span style="font-size:11px;font-weight:700;background:${ev.tag_color||'var(--gold)'}22;color:${ev.tag_color||'var(--gold)'};border-radius:6px;padding:3px 8px">${ev.category||'Event'}</span>
+                </div>
+                <div style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px">${ev.title}</div>
+                <div style="font-size:12.5px;color:var(--txt2);margin-bottom:6px">📅 ${ev.event_date} · ${ev.event_time}</div>
+                <div style="font-size:12.5px;color:var(--txt2);margin-bottom:14px">📍 ${ev.venue||'Online'}</div>
+                <div style="font-size:13px;color:var(--txt2);margin-bottom:14px;line-height:1.5">${ev.description?.substring(0,100)||''}...</div>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <span style="font-size:12px;color:${spots===0?'var(--red)':isReg?'var(--teal)':'var(--txt2)'};font-weight:${isReg||spots===0?'700':''}">${spots===0?'Event Full':isReg?'✓ Registered':`${spots} spots left`}</span>
+                  ${isReg ? `<button class="btn btn-secondary btn-sm" onclick="cancelReg('${ev.id}')">Cancel</button>` : spots > 0 ? `<button class="btn btn-primary btn-sm" onclick="registerEvent('${ev.id}')">Register</button>` : ''}
+                </div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderProfile() {
+    const user = Api.getUser();
+    const inv = INVESTOR_PROFILE;
+    const sectors = JSON.parse(inv?.focus_sectors||'[]');
+    document.getElementById('content').innerHTML = `
+      <div class="fade-up" style="max-width:760px;margin:0 auto">
+        <div class="ph"><h1>Investor Profile</h1><p>Your profile as shown to startups and the LaunchPad team.</p></div>
+        <div class="card" style="margin-bottom:20px">
+          <div style="display:flex;align-items:center;gap:18px;margin-bottom:24px">
+            <div style="width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--orange));display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;font-family:'Space Grotesk',sans-serif">${(user?.name||'VB').substring(0,2).toUpperCase()}</div>
+            <div>
+              <div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700">${user?.name||''}</div>
+              <div style="font-size:13px;color:var(--txt2)">${inv?.organization||''} · ${inv?.investor_type||'Investor'}</div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group"><label class="lbl">Organization / Fund Name</label><input class="inp" id="pfOrg" value="${inv?.organization||''}" type="text"/></div>
+            <div class="form-group"><label class="lbl">Investor Type</label>
+              <select class="inp" id="pfType">
+                ${['Venture Capital','Angel Network','Micro VC','Impact Investor','Family Office','Sector Fund'].map(t=>`<option ${t===inv?.investor_type?'selected':''}>${t}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group"><label class="lbl">Focus Sectors (comma separated)</label><input class="inp" id="pfSectors" value="${sectors.join(', ')}" type="text"/></div>
+            <div class="form-group"><label class="lbl">Investment Range</label><input class="inp" id="pfRange" value="${inv?.investment_range_text||''}" placeholder="e.g. ₹50L – ₹5Cr"/></div>
+            <div class="form-group"><label class="lbl">Preferred Stage</label>
+              <select class="inp" id="pfStage">
+                ${['Pre-Seed','Seed','Series A','Series B+','Any Stage'].map(s=>`<option ${s===inv?.preferred_stage?'selected':''}>${s}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group"><label class="lbl">Portfolio Size</label><input class="inp" id="pfPortfolio" value="${inv?.portfolio_count||0}" type="number"/></div>
+          </div>
+          <div class="form-group"><label class="lbl">Description</label><textarea class="inp" id="pfDesc" rows="4">${inv?.description||''}</textarea></div>
+          <div class="form-group"><label class="lbl">Website</label><input class="inp" id="pfWebsite" value="${inv?.website||''}" type="url" placeholder="https://..."/></div>
+          <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
+        </div>
+        <div class="card">
+          <div style="font-size:14px;font-weight:700;margin-bottom:14px">Account</div>
+          <div class="info-row"><div class="info-label">Email</div><div class="info-value">${user?.email||''}</div></div>
+          <div class="info-row" style="border:none"><div class="info-label">Role</div><div class="info-value"><span class="tag tag-gold">💼 Investor</span></div></div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ── ACTIONS ──
+  async function toggleWatch(startupId, btn) {
+    try {
+      const result = await Api.toggleWatchlist(startupId);
+      if (result.action === 'added') {
+        WATCHLIST.push({id: startupId, name: ''});
+        if (btn) btn.classList.add('saved');
+        showToast('Added to watchlist', '❤️');
+      } else {
+        WATCHLIST = WATCHLIST.filter(w => w.id !== startupId);
+        if (btn) btn.classList.remove('saved');
+        showToast('Removed from watchlist', '🤍');
+      }
+      document.getElementById('badge-wl').textContent = WATCHLIST.length;
+    } catch(e) { showToast('Error: ' + e.message, '❌'); }
+  }
+
+  function openInterest(startupId, startupName) {
+    document.getElementById('intStartupId').value = startupId;
+    document.getElementById('intStartupName').value = startupName;
+    document.getElementById('interestModal').classList.add('open');
+  }
+
+  async function submitInterest() {
+    const startup_id = document.getElementById('intStartupId').value;
+    const proposed_amount = parseInt(document.getElementById('intAmount').value)||0;
+    const investment_type = document.getElementById('intType').value;
+    const message = document.getElementById('intMessage').value;
+    try {
+      await Api.showInterest({ startup_id, proposed_amount, investment_type, message });
+      closeModal('interestModal');
+      const existing = INTERESTS.find(i=>i.startup_id===startup_id);
+      if (!existing) INTERESTS.push({startup_id, startup_name: document.getElementById('intStartupName').value, status:'interested', proposed_amount});
+      document.getElementById('badge-int').textContent = INTERESTS.length;
+      showToast('Investment interest sent!', '💼');
+    } catch(e) { showToast('Error: ' + e.message, '❌'); }
+  }
+
+  async function registerEvent(id) {
+    try { await Api.registerEvent(id); showToast('Registered!', '🎟️'); await renderEvents(); } catch(e) { showToast(e.message, '❌'); }
+  }
+
+  async function cancelReg(id) {
+    try { await Api.cancelEventRegistration(id); showToast('Registration cancelled', '❌'); await renderEvents(); } catch(e) { showToast(e.message, '❌'); }
+  }
+
+  async function loadConv(id) { activeConvId = id; await renderMessages(); }
+
+  async function sendMsg() {
+    const input = document.getElementById('invChatInput');
+    const text = input?.value?.trim();
+    if (!text) return;
+    try { await Api.replyInConversation(activeConvId, text); input.value = ''; await renderMessages(); } catch(e) { showToast('Send failed','❌'); }
+  }
+
+  async function saveProfile() {
+    const sectors = (document.getElementById('pfSectors')?.value||'').split(',').map(s=>s.trim()).filter(Boolean);
+    try {
+      await Api.updateInvestorProfile({
+        organization: document.getElementById('pfOrg')?.value,
+        investor_type: document.getElementById('pfType')?.value,
+        focus_sectors: sectors,
+        investment_range_text: document.getElementById('pfRange')?.value,
+        preferred_stage: document.getElementById('pfStage')?.value,
+        portfolio_count: parseInt(document.getElementById('pfPortfolio')?.value)||0,
+        description: document.getElementById('pfDesc')?.value,
+        website: document.getElementById('pfWebsite')?.value
+      });
+      showToast('Profile saved!', '✅');
+    } catch(e) { showToast('Failed: ' + e.message, '❌'); }
+  }
+
+  function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
+  document.addEventListener('click', e => { if(e.target.classList.contains('overlay')) e.target.classList.remove('open'); });
+
+  function initTabs() {
+    document.querySelectorAll('.tabs').forEach(tabs => {
+      tabs.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+          tab.classList.add('active');
+          document.querySelectorAll('.tc').forEach(tc => tc.classList.toggle('active', tc.id===tab.dataset.target));
+        });
+      });
+    });
+  }
+
+  function showToast(msg, icon='✅') {
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.innerHTML = `<span style="font-size:18px">${icon}</span>${msg}`;
+    document.getElementById('toastContainer').appendChild(t);
+    setTimeout(()=>t.remove(), 4000);
+  }
+
+  init();
+  </script>
+</body>
+</html>

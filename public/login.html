@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — LaunchPad Incubator</title>
+  <meta name="description" content="Sign in to LaunchPad — India's premier startup incubator platform."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="/js/api.js"></script>
+  <style>
+    :root{--bg:#07090F;--bg-surface:#0D1421;--accent:#6C63FF;--teal:#00D4AA;--txt:#EDF1FA;--txt2:#7B89A0;--border:rgba(255,255,255,0.07);}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+    .bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(108,99,255,0.04)1px,transparent 1px),linear-gradient(90deg,rgba(108,99,255,0.04)1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 80% at 50% 0%,black 40%,transparent 100%);}
+    .glow{position:fixed;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(108,99,255,0.08),transparent 70%);top:-200px;left:50%;transform:translateX(-50%);pointer-events:none;}
+    .card{position:relative;z-index:10;background:rgba(13,20,33,0.95);border:1px solid var(--border);border-radius:24px;padding:40px;width:100%;max-width:440px;backdrop-filter:blur(20px);box-shadow:0 32px 64px rgba(0,0,0,0.5);}
+    .logo{display:flex;align-items:center;gap:10px;margin-bottom:32px;}
+    .logo-mark{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--teal));display:flex;align-items:center;justify-content:center;}
+    .logo-mark svg{width:22px;height:22px;color:#fff;}
+    .logo-text{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;background:linear-gradient(to right,#fff,#A78BFA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    h1{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;margin-bottom:6px;}
+    .subtitle{font-size:14px;color:var(--txt2);margin-bottom:32px;}
+    .form-group{margin-bottom:18px;}
+    label{display:block;font-size:12px;font-weight:600;color:var(--txt2);margin-bottom:7px;text-transform:uppercase;letter-spacing:0.5px;}
+    input{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--txt);font-size:14px;border-radius:12px;padding:12px 16px;font-family:inherit;transition:border-color 0.2s;outline:none;}
+    input:focus{border-color:var(--accent);}
+    input::placeholder{color:rgba(123,137,160,0.5);}
+    .btn{width:100%;background:linear-gradient(135deg,var(--accent),#8B5CF6);color:#fff;font-size:15px;font-weight:600;border-radius:12px;padding:13px;border:none;cursor:pointer;font-family:inherit;transition:all 0.2s;box-shadow:0 4px 20px rgba(108,99,255,0.4);margin-top:8px;}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(108,99,255,0.5);}
+    .btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+    .divider{display:flex;align-items:center;gap:12px;margin:24px 0;color:var(--txt2);font-size:12px;}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+    .demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .demo-btn{background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--txt2);font-size:12px;font-weight:500;border-radius:10px;padding:10px 8px;cursor:pointer;font-family:inherit;transition:all 0.2s;text-align:center;}
+    .demo-btn:hover{border-color:var(--accent);color:var(--txt);background:rgba(108,99,255,0.08);}
+    .demo-btn .role{font-size:11px;color:var(--accent);font-weight:700;text-transform:uppercase;display:block;margin-bottom:3px;}
+    .links{display:flex;justify-content:space-between;margin-top:24px;font-size:13px;}
+    .links a{color:var(--accent);text-decoration:none;}
+    .links a:hover{text-decoration:underline;}
+    .error-msg{background:rgba(255,77,106,0.1);border:1px solid rgba(255,77,106,0.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#FF4D6A;margin-bottom:16px;display:none;}
+    .error-msg.show{display:block;}
+    .success-msg{background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.3);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--teal);margin-bottom:16px;display:none;}
+    .success-msg.show{display:block;}
+    .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .back-link{display:flex;align-items:center;gap:6px;color:var(--txt2);font-size:13px;text-decoration:none;margin-bottom:24px;}
+    .back-link:hover{color:var(--txt);}
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="glow"></div>
+  
+  <div class="card">
+    <a href="/" class="back-link">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Home
+    </a>
+
+    <div class="logo">
+      <div class="logo-mark">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+      </div>
+      <span class="logo-text">LaunchPad</span>
+    </div>
+
+    <h1>Welcome back</h1>
+    <p class="subtitle">Sign in to your LaunchPad account</p>
+
+    <div id="errorMsg" class="error-msg"></div>
+    <div id="successMsg" class="success-msg"></div>
+
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="you@example.com" required autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password"/>
+      </div>
+      <button type="submit" class="btn" id="loginBtn">Sign In</button>
+    </form>
+
+    <div class="divider">Or sign in as demo user</div>
+
+    <div class="demo-grid">
+      <button class="demo-btn" onclick="demoLogin('startup')">
+        <span class="role">🚀 Startup</span>
+        startup@launchpad.demo
+      </button>
+      <button class="demo-btn" onclick="demoLogin('mentor')">
+        <span class="role">🎓 Mentor</span>
+        mentor@launchpad.demo
+      </button>
+      <button class="demo-btn" onclick="demoLogin('investor')">
+        <span class="role">💼 Investor</span>
+        investor@launchpad.demo
+      </button>
+      <button class="demo-btn" onclick="demoLogin('admin')">
+        <span class="role">⚙️ Admin</span>
+        admin@launchpad.demo
+      </button>
+    </div>
+
+    <div class="links">
+      <a href="/register">Create account →</a>
+      <a href="/">Back to Home</a>
+    </div>
+  </div>
+
+  <script>
+    // Redirect if already logged in
+    if (Api.isLoggedIn()) {
+      const user = Api.getUser();
+      if (user) Api.redirectToDashboard(user.role);
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('loginBtn');
+      const errorMsg = document.getElementById('errorMsg');
+      const successMsg = document.getElementById('successMsg');
+
+      errorMsg.classList.remove('show');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Signing in...';
+
+      try {
+        const data = await Api.login(email, password);
+        Api.setAuth(data.token, data.user);
+        successMsg.textContent = `Welcome back, ${data.user.name}! Redirecting...`;
+        successMsg.classList.add('show');
+        setTimeout(() => Api.redirectToDashboard(data.user.role), 800);
+      } catch (err) {
+        errorMsg.textContent = err.message || 'Login failed. Please check your credentials.';
+        errorMsg.classList.add('show');
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+      }
+    }
+
+    async function demoLogin(role) {
+      const emails = {
+        startup: 'startup@launchpad.demo',
+        mentor: 'mentor@launchpad.demo',
+        investor: 'investor@launchpad.demo',
+        admin: 'admin@launchpad.demo'
+      };
+      document.getElementById('email').value = emails[role];
+      document.getElementById('password').value = 'Demo@2024';
+      document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register — LaunchPad Incubator</title>
+  <meta name="description" content="Join LaunchPad as a Founder, Mentor, or Investor. India's premier startup incubator platform."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="/js/api.js"></script>
+  <style>
+    :root{--bg:#07090F;--accent:#6C63FF;--teal:#00D4AA;--orange:#FF7A50;--txt:#EDF1FA;--txt2:#7B89A0;--border:rgba(255,255,255,0.07);}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+    .bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(108,99,255,0.04)1px,transparent 1px),linear-gradient(90deg,rgba(108,99,255,0.04)1px,transparent 1px);background-size:60px 60px;}
+    .card{position:relative;z-index:10;background:rgba(13,20,33,0.95);border:1px solid var(--border);border-radius:24px;padding:40px;width:100%;max-width:520px;backdrop-filter:blur(20px);box-shadow:0 32px 64px rgba(0,0,0,0.5);}
+    .logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;}
+    .logo-mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--teal));display:flex;align-items:center;justify-content:center;}
+    .logo-text{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;background:linear-gradient(to right,#fff,#A78BFA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    h1{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;margin-bottom:6px;}
+    .subtitle{font-size:13.5px;color:var(--txt2);margin-bottom:28px;}
+    .role-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:28px;}
+    .role-tab{border:1px solid var(--border);border-radius:12px;padding:14px 10px;cursor:pointer;text-align:center;transition:all 0.2s;background:rgba(255,255,255,0.02);}
+    .role-tab:hover{border-color:var(--accent);}
+    .role-tab.active{border-color:var(--accent);background:rgba(108,99,255,0.12);}
+    .role-tab .emoji{font-size:22px;margin-bottom:6px;display:block;}
+    .role-tab .name{font-size:13px;font-weight:600;display:block;margin-bottom:2px;}
+    .role-tab .desc{font-size:11px;color:var(--txt2);}
+    .role-tab.active .name{color:var(--accent);}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .form-group{margin-bottom:0;}
+    .form-group.full{grid-column:1/-1;}
+    label{display:block;font-size:11.5px;font-weight:600;color:var(--txt2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;}
+    input,select,textarea{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--txt);font-size:13.5px;border-radius:10px;padding:11px 14px;font-family:inherit;transition:border-color 0.2s;outline:none;}
+    input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+    input::placeholder,textarea::placeholder{color:rgba(123,137,160,0.5);}
+    select{appearance:none;cursor:pointer;}
+    select option{background:#0D1421;}
+    textarea{resize:vertical;min-height:80px;line-height:1.5;}
+    .btn{width:100%;background:linear-gradient(135deg,var(--accent),#8B5CF6);color:#fff;font-size:14px;font-weight:600;border-radius:12px;padding:13px;border:none;cursor:pointer;font-family:inherit;transition:all 0.2s;box-shadow:0 4px 20px rgba(108,99,255,0.4);margin-top:20px;}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(108,99,255,0.5);}
+    .btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+    .error-msg{background:rgba(255,77,106,0.1);border:1px solid rgba(255,77,106,0.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#FF4D6A;margin-bottom:16px;display:none;}
+    .error-msg.show{display:block;}
+    .links{text-align:center;margin-top:20px;font-size:13px;color:var(--txt2);}
+    .links a{color:var(--accent);text-decoration:none;}
+    .role-fields{display:none;}
+    .role-fields.show{display:grid;}
+    .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .back-link{display:flex;align-items:center;gap:6px;color:var(--txt2);font-size:13px;text-decoration:none;margin-bottom:20px;}
+    .back-link:hover{color:var(--txt);}
+    .section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--txt2);margin:20px 0 14px;padding-top:16px;border-top:1px solid var(--border);grid-column:1/-1;}
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="card">
+    <a href="/" class="back-link">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Home
+    </a>
+
+    <div class="logo">
+      <div class="logo-mark">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="white" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      </div>
+      <span class="logo-text">LaunchPad</span>
+    </div>
+
+    <h1>Create your account</h1>
+    <p class="subtitle">Join India's premier startup incubator ecosystem</p>
+
+    <div class="role-tabs">
+      <div class="role-tab active" onclick="selectRole('startup', this)">
+        <span class="emoji">🚀</span>
+        <span class="name">Founder</span>
+        <span class="desc">Apply for incubation</span>
+      </div>
+      <div class="role-tab" onclick="selectRole('mentor', this)">
+        <span class="emoji">🎓</span>
+        <span class="name">Mentor</span>
+        <span class="desc">Guide startups</span>
+      </div>
+      <div class="role-tab" onclick="selectRole('investor', this)">
+        <span class="emoji">💼</span>
+        <span class="name">Investor</span>
+        <span class="desc">Discover deals</span>
+      </div>
+    </div>
+
+    <div id="errorMsg" class="error-msg"></div>
+
+    <form id="registerForm" onsubmit="handleRegister(event)">
+      <input type="hidden" id="roleInput" value="startup"/>
+
+      <div class="form-grid">
+        <div class="section-title">Personal Information</div>
+
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" id="full_name" placeholder="Arjun Sharma" required/>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="phone" placeholder="+91 98765 43210"/>
+        </div>
+        <div class="form-group">
+          <label>Email Address *</label>
+          <input type="email" id="email" placeholder="you@example.com" required/>
+        </div>
+        <div class="form-group">
+          <label>Password *</label>
+          <input type="password" id="password" placeholder="Min 6 characters" required minlength="6"/>
+        </div>
+
+        <!-- STARTUP fields -->
+        <div id="startupFields" class="role-fields show form-grid" style="grid-column:1/-1">
+          <div class="section-title">Startup Information</div>
+          <div class="form-group">
+            <label>Startup Name *</label>
+            <input type="text" id="startup_name" placeholder="NovaSphere"/>
+          </div>
+          <div class="form-group">
+            <label>Industry *</label>
+            <select id="industry">
+              <option value="">Select Industry</option>
+              <option>AgriTech / AI</option>
+              <option>FinTech / BFSI</option>
+              <option>HealthTech / Telemedicine</option>
+              <option>EdTech</option>
+              <option>CleanTech / Sustainability</option>
+              <option>E-Commerce / D2C</option>
+              <option>Logistics / Supply Chain</option>
+              <option>SaaS / B2B</option>
+              <option>DeepTech / AI</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- MENTOR fields -->
+        <div id="mentorFields" class="role-fields form-grid" style="grid-column:1/-1">
+          <div class="section-title">Professional Background</div>
+          <div class="form-group">
+            <label>Primary Expertise</label>
+            <input type="text" id="expertise" placeholder="e.g. Product Strategy, FinTech"/>
+          </div>
+          <div class="form-group">
+            <label>Years of Experience</label>
+            <select id="experience">
+              <option>5+ years</option>
+              <option>8+ years</option>
+              <option>10+ years</option>
+              <option>15+ years</option>
+              <option>20+ years</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Short Bio</label>
+            <textarea id="bio" placeholder="Brief background about your startup experience..."></textarea>
+          </div>
+        </div>
+
+        <!-- INVESTOR fields -->
+        <div id="investorFields" class="role-fields form-grid" style="grid-column:1/-1">
+          <div class="section-title">Investment Profile</div>
+          <div class="form-group">
+            <label>Organization / Fund Name</label>
+            <input type="text" id="organization" placeholder="TechVentures India"/>
+          </div>
+          <div class="form-group">
+            <label>Investment Sectors</label>
+            <input type="text" id="investment_sectors" placeholder="e.g. AgriTech, AI, FinTech"/>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn" id="registerBtn">Create Account</button>
+    </form>
+
+    <div class="links">
+      Already have an account? <a href="/login">Sign In →</a>
+    </div>
+  </div>
+
+  <script>
+    let currentRole = 'startup';
+
+    function selectRole(role, el) {
+      currentRole = role;
+      document.getElementById('roleInput').value = role;
+      document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+
+      document.querySelectorAll('.role-fields').forEach(f => {
+        f.classList.remove('show');
+        f.style.display = 'none';
+      });
+
+      const map = { startup: 'startupFields', mentor: 'mentorFields', investor: 'investorFields' };
+      const el2 = document.getElementById(map[role]);
+      if (el2) { el2.classList.add('show'); el2.style.display = 'grid'; }
+
+      // Startup name required only for startups
+      const sn = document.getElementById('startup_name');
+      if (sn) sn.required = (role === 'startup');
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const btn = document.getElementById('registerBtn');
+      const errorMsg = document.getElementById('errorMsg');
+      errorMsg.classList.remove('show');
+
+      const data = {
+        role: currentRole,
+        full_name: document.getElementById('full_name').value,
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value,
+        phone: document.getElementById('phone').value,
+      };
+
+      if (currentRole === 'startup') {
+        data.startup_name = document.getElementById('startup_name').value;
+        data.industry = document.getElementById('industry').value;
+        if (!data.startup_name) { showError('Please enter your startup name.'); return; }
+      } else if (currentRole === 'mentor') {
+        data.expertise = document.getElementById('expertise').value;
+        data.experience = document.getElementById('experience').value;
+        data.bio = document.getElementById('bio').value;
+      } else if (currentRole === 'investor') {
+        data.organization = document.getElementById('organization').value;
+        data.investment_sectors = document.getElementById('investment_sectors').value;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Creating account...';
+
+      try {
+        const result = await Api.register(data);
+        Api.setAuth(result.token, result.user);
+        btn.textContent = '✓ Account created! Redirecting...';
+        setTimeout(() => Api.redirectToDashboard(result.user.role), 800);
+      } catch (err) {
+        showError(err.message || 'Registration failed. Please try again.');
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+      }
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('errorMsg');
+      el.textContent = msg;
+      el.classList.add('show');
+    }
+
+    // Init
+    selectRole('startup', document.querySelector('.role-tab'));
+  </script>
+</body>
+</html>
