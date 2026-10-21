@@ -1,4 +1,33 @@
+# Node.js & general project ignores
+# Dependencies
 node_modules/
+
+# Build output directories
+dist/
+build/
+
+# Environment files
 .env
-launchpad.db
+.env.*
+
+# Logs
+npm-debug.log*
+*.log
+
+# OS generated files
 .DS_Store
+Thumbs.db
+
+# IDE/editor directories
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Optional: coverage reports
+coverage/
+
+# Optional: temporary files
+tmp/
+temp/
+*.tmp
