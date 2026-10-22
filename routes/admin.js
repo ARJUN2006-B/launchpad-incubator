@@ -124,9 +124,9 @@ router.put('/applications/:id', (req, res) => {
 // GET /api/admin/mentors — All mentors
 router.get('/mentors', (req, res) => {
   const mentors = dbWrapper.all(`
-    SELECT m.*, u.email, u.full_name,
+    SELECT m.*, COALESCE(u.email, '') as email, COALESCE(u.full_name, m.name) as full_name,
     (SELECT COUNT(*) FROM mentor_assignments ma WHERE ma.mentor_id = m.id AND ma.is_active = 1) as assigned_count
-    FROM mentors m JOIN users u ON m.user_id = u.id ORDER BY m.created_at DESC`
+    FROM mentors m LEFT JOIN users u ON m.user_id = u.id ORDER BY m.created_at DESC`
   );
   res.json({ mentors });
 });
@@ -160,7 +160,7 @@ router.post('/mentor/assign', (req, res) => {
 
 // GET /api/admin/investors — All investors
 router.get('/investors', (req, res) => {
-  const investors = dbWrapper.all('SELECT i.*, u.email FROM investors i JOIN users u ON i.user_id = u.id ORDER BY i.created_at DESC');
+  const investors = dbWrapper.all('SELECT i.*, COALESCE(u.email, \'\') as email FROM investors i LEFT JOIN users u ON i.user_id = u.id ORDER BY i.created_at DESC');
   res.json({ investors });
 });
 

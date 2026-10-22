@@ -36,7 +36,7 @@ router.get('/my', auth, (req, res) => {
   // Include milestones, tasks, documents, and funding in one response
   const milestones = dbWrapper.all('SELECT * FROM milestones WHERE startup_id = ? ORDER BY created_at ASC', [startup.id]);
   const milestonesWithTasks = milestones.map(ms => {
-    const tasks = dbWrapper.all('SELECT * FROM milestone_tasks WHERE milestone_id = ? ORDER BY sort_order ASC', [ms.id]);
+    const tasks = dbWrapper.all('SELECT * FROM milestone_tasks WHERE milestone_id = ? ORDER BY order_index ASC', [ms.id]);
     return { ...ms, tasks };
   });
 

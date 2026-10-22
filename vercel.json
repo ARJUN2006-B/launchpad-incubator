@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.js" },
+    { "source": "/dashboard", "destination": "/dashboards/startup/index.html" },
+    { "source": "/dashboard/startup", "destination": "/dashboards/startup/index.html" },
+    { "source": "/dashboard/mentor", "destination": "/dashboards/mentor/index.html" },
+    { "source": "/dashboard/investor", "destination": "/dashboards/investor/index.html" },
+    { "source": "/dashboard/admin", "destination": "/dashboards/admin/index.html" },
+    { "source": "/login", "destination": "/public/login.html" },
+    { "source": "/register", "destination": "/public/register.html" },
+    { "source": "/about", "destination": "/public/about.html" },
+    { "source": "/programs", "destination": "/public/programs.html" },
+    { "source": "/startups", "destination": "/public/startups.html" },
+    { "source": "/mentors", "destination": "/public/mentors.html" },
+    { "source": "/events", "destination": "/public/events.html" },
+    { "source": "/contact", "destination": "/public/contact.html" }
+  ]
+}

@@ -43,7 +43,7 @@ router.get('/opportunities', auth, (req, res) => {
   if (search) { sql += ' AND (s.name LIKE ? OR s.tagline LIKE ? OR s.industry LIKE ?)'; params.push(`%${search}%`, `%${search}%`, `%${search}%`); }
   sql += ' ORDER BY s.progress DESC';
   const startups = dbWrapper.all(sql, params);
-  res.json({ startups });
+  res.json({ startups, opportunities: startups });
 });
 
 // GET /api/investors/watchlist

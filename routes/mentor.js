@@ -123,7 +123,7 @@ router.post('/evaluations', ...requireRole('mentor'), (req, res) => {
 // GET /api/mentor/all — Public mentor list
 router.get('/all', (req, res) => {
   const mentors = dbWrapper.all(
-    `SELECT m.*, u.email FROM mentors m JOIN users u ON m.user_id = u.id WHERE m.is_verified = 1 ORDER BY m.rating DESC`
+    `SELECT m.*, COALESCE(u.email, '') as email FROM mentors m LEFT JOIN users u ON m.user_id = u.id WHERE m.is_verified = 1 ORDER BY m.rating DESC`
   );
   res.json({ mentors });
 });
