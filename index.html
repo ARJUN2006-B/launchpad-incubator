@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LaunchPad — India's Premier Startup Incubator Platform</title>
+  <meta name="description" content="LaunchPad empowers India's boldest startup founders with mentorship, funding, investor connections, and world-class incubation support."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="/js/api.js"></script>
+  <style>
+    :root{
+      --bg:#07090F; --bg2:#0D1421; --bg3:#111827;
+      --accent:#6C63FF; --teal:#00D4AA; --orange:#FF7A50; --gold:#FFB830; --red:#FF4D6A;
+      --txt:#EDF1FA; --txt2:#7B89A0; --txt3:#4A5568;
+      --border:rgba(255,255,255,0.07); --radius:16px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);overflow-x:hidden;}
+
+    /* NAV */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:68px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid transparent;transition:all 0.3s;}
+    nav.scrolled{background:rgba(7,9,15,0.9);border-color:var(--border);backdrop-filter:blur(20px);}
+    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .nav-logo-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--teal));display:flex;align-items:center;justify-content:center;}
+    .nav-logo-mark svg{width:18px;height:18px;color:#fff;}
+    .nav-logo-text{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;background:linear-gradient(to right,#fff,#A78BFA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .nav-links{display:flex;gap:32px;list-style:none;}
+    .nav-links a{color:var(--txt2);font-size:14px;font-weight:500;text-decoration:none;transition:color 0.2s;}
+    .nav-links a:hover{color:var(--txt);}
+    .nav-actions{display:flex;gap:12px;align-items:center;}
+    .btn-nav-ghost{background:transparent;border:1px solid var(--border);color:var(--txt);font-size:13.5px;font-weight:500;border-radius:10px;padding:8px 18px;cursor:pointer;font-family:inherit;transition:all 0.2s;text-decoration:none;}
+    .btn-nav-ghost:hover{border-color:var(--accent);color:var(--accent);}
+    .btn-nav{background:linear-gradient(135deg,var(--accent),#8B5CF6);color:#fff;font-size:13.5px;font-weight:600;border-radius:10px;padding:9px 20px;border:none;cursor:pointer;font-family:inherit;transition:all 0.2s;text-decoration:none;box-shadow:0 4px 16px rgba(108,99,255,0.35);}
+    .btn-nav:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(108,99,255,0.5);}
+
+    /* HERO */
+    .hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:120px 40px 80px;position:relative;overflow:hidden;}
+    .hero-bg{position:absolute;inset:0;z-index:0;}
+    .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(108,99,255,0.05)1px,transparent 1px),linear-gradient(90deg,rgba(108,99,255,0.05)1px,transparent 1px);background-size:50px 50px;mask-image:radial-gradient(ellipse 100% 80% at 50% 0%,black 30%,transparent 100%);}
+    .hero-orb1{position:absolute;top:-100px;left:20%;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(108,99,255,0.12) 0%,transparent 70%);animation:float 8s ease-in-out infinite;}
+    .hero-orb2{position:absolute;top:10%;right:15%;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,170,0.08) 0%,transparent 70%);animation:float 10s ease-in-out infinite 2s;}
+    .hero-orb3{position:absolute;bottom:-50px;left:10%;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(255,122,80,0.06) 0%,transparent 70%);animation:float 7s ease-in-out infinite 4s;}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-30px)}}
+    .hero-inner{position:relative;z-index:1;max-width:820px;margin:0 auto;}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(108,99,255,0.12);border:1px solid rgba(108,99,255,0.25);border-radius:100px;padding:7px 16px;font-size:12.5px;font-weight:600;color:var(--accent);margin-bottom:28px;animation:fadeUp 0.8s ease both;}
+    .hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+    h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(42px,6vw,80px);font-weight:800;line-height:1.05;margin-bottom:22px;animation:fadeUp 0.8s ease 0.1s both;}
+    .h1-grad{background:linear-gradient(135deg,#fff 30%,var(--accent) 60%,var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .hero-desc{font-size:18px;color:var(--txt2);max-width:580px;margin:0 auto 40px;line-height:1.7;animation:fadeUp 0.8s ease 0.2s both;}
+    .hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;animation:fadeUp 0.8s ease 0.3s both;}
+    .btn-primary{background:linear-gradient(135deg,var(--accent),#8B5CF6);color:#fff;font-size:15px;font-weight:600;border-radius:14px;padding:14px 28px;border:none;cursor:pointer;font-family:inherit;transition:all 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 24px rgba(108,99,255,0.4);}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(108,99,255,0.5);}
+    .btn-outline{background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--txt);font-size:15px;font-weight:500;border-radius:14px;padding:14px 28px;cursor:pointer;font-family:inherit;transition:all 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+    .btn-outline:hover{border-color:var(--accent);background:rgba(108,99,255,0.05);}
+    .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-top:64px;max-width:560px;margin-left:auto;margin-right:auto;animation:fadeUp 0.8s ease 0.5s both;}
+    .hero-stat{background:rgba(13,20,33,0.8);padding:28px 20px;text-align:center;backdrop-filter:blur(10px);}
+    .hero-stat-num{font-family:'Space Grotesk',sans-serif;font-size:36px;font-weight:800;background:linear-gradient(135deg,var(--txt),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .hero-stat-lbl{font-size:12px;color:var(--txt2);margin-top:4px;font-weight:500;}
+
+    /* SECTIONS */
+    section{padding:100px 40px;}
+    .section-inner{max-width:1200px;margin:0 auto;}
+    .section-tag{display:inline-block;background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.2);border-radius:100px;padding:5px 14px;font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;}
+    .section-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(28px,4vw,48px);font-weight:700;margin-bottom:16px;line-height:1.2;}
+    .section-sub{font-size:16px;color:var(--txt2);max-width:580px;line-height:1.7;}
+    .section-header{margin-bottom:60px;}
+
+    /* FEATURES GRID */
+    .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;}
+    .feature-card{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;transition:all 0.3s;position:relative;overflow:hidden;}
+    .feature-card::before{content:'';position:absolute;top:-1px;left:20px;right:20px;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;transition:opacity 0.3s;}
+    .feature-card:hover{transform:translateY(-4px);border-color:rgba(108,99,255,0.3);box-shadow:0 20px 40px rgba(0,0,0,0.3);}
+    .feature-card:hover::before{opacity:1;}
+    .feature-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:18px;}
+    .feature-title{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;margin-bottom:8px;}
+    .feature-desc{font-size:13.5px;color:var(--txt2);line-height:1.6;}
+
+    /* STARTUPS SHOWCASE */
+    .startups-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;}
+    .startup-card{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:24px;transition:all 0.3s;}
+    .startup-card:hover{transform:translateY(-3px);border-color:rgba(108,99,255,0.25);box-shadow:0 16px 32px rgba(0,0,0,0.3);}
+    .startup-logo{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;font-family:'Space Grotesk',sans-serif;margin-bottom:16px;}
+    .startup-name{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;margin-bottom:4px;}
+    .startup-tagline{font-size:13px;color:var(--txt2);margin-bottom:16px;line-height:1.5;}
+    .startup-tags{display:flex;gap:6px;flex-wrap:wrap;}
+    .tag{font-size:11px;font-weight:600;border-radius:6px;padding:4px 9px;}
+    .tag-purple{background:rgba(108,99,255,0.12);color:#A78BFA;}
+    .tag-teal{background:rgba(0,212,170,0.12);color:var(--teal);}
+    .tag-orange{background:rgba(255,122,80,0.12);color:var(--orange);}
+    .startup-progress{margin-top:16px;}
+    .prog-label{display:flex;justify-content:space-between;font-size:11px;color:var(--txt2);margin-bottom:6px;}
+    .prog-track{height:4px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;}
+    .prog-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent),var(--teal));}
+
+    /* PROCESS */
+    .process-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0;position:relative;}
+    .process-grid::before{content:'';position:absolute;top:48px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--accent),var(--teal),transparent);}
+    .process-step{text-align:center;padding:0 20px;position:relative;z-index:1;}
+    .step-num{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--teal));display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 20px;font-weight:800;font-family:'Space Grotesk',sans-serif;box-shadow:0 0 0 8px rgba(108,99,255,0.1);}
+    .step-title{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;margin-bottom:8px;}
+    .step-desc{font-size:13px;color:var(--txt2);line-height:1.6;}
+
+    /* MENTORS */
+    .mentors-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;}
+    .mentor-card{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:24px;text-align:center;transition:all 0.3s;}
+    .mentor-card:hover{transform:translateY(-3px);border-color:rgba(108,99,255,0.25);}
+    .mentor-av{width:68px;height:68px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;font-family:'Space Grotesk',sans-serif;margin:0 auto 14px;}
+    .mentor-name{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px;}
+    .mentor-role{font-size:12.5px;color:var(--txt2);margin-bottom:16px;}
+    .mentor-tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+    .stars{color:var(--gold);font-size:13px;margin-bottom:4px;}
+
+    /* STATS SECTION */
+    .stats-section{background:linear-gradient(135deg,rgba(108,99,255,0.05),rgba(0,212,170,0.05));border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:40px;text-align:center;}
+    .stat-num{font-family:'Space Grotesk',sans-serif;font-size:48px;font-weight:800;background:linear-gradient(135deg,var(--txt),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .stat-lbl{font-size:14px;color:var(--txt2);margin-top:4px;}
+
+    /* CTA SECTION */
+    .cta-section{text-align:center;}
+    .cta-card{background:linear-gradient(135deg,rgba(108,99,255,0.12),rgba(0,212,170,0.08));border:1px solid rgba(108,99,255,0.2);border-radius:28px;padding:80px 60px;position:relative;overflow:hidden;}
+    .cta-card::before{content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(108,99,255,0.15),transparent 70%);pointer-events:none;}
+    .cta-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(28px,4vw,52px);font-weight:800;margin-bottom:16px;}
+    .cta-sub{font-size:16px;color:var(--txt2);margin-bottom:40px;max-width:480px;margin-left:auto;margin-right:auto;}
+    .cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+    .cta-roles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:40px;max-width:560px;margin-left:auto;margin-right:auto;}
+    .cta-role{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;transition:all 0.2s;text-decoration:none;color:inherit;}
+    .cta-role:hover{border-color:var(--accent);background:rgba(108,99,255,0.08);transform:translateY(-2px);}
+    .cta-role-icon{font-size:24px;margin-bottom:8px;}
+    .cta-role-name{font-size:14px;font-weight:600;margin-bottom:2px;}
+    .cta-role-desc{font-size:11px;color:var(--txt2);}
+
+    /* FOOTER */
+    footer{background:var(--bg2);border-top:1px solid var(--border);padding:60px 40px 40px;}
+    .footer-inner{max-width:1200px;margin:0 auto;}
+    .footer-top{display:grid;grid-template-columns:1fr auto auto auto;gap:60px;margin-bottom:48px;}
+    .footer-brand p{font-size:13.5px;color:var(--txt2);margin-top:12px;max-width:280px;line-height:1.6;}
+    .footer-col h4{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--txt2);margin-bottom:16px;}
+    .footer-col a{display:block;color:var(--txt2);font-size:13.5px;text-decoration:none;margin-bottom:10px;transition:color 0.2s;}
+    .footer-col a:hover{color:var(--txt);}
+    .footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:24px;border-top:1px solid var(--border);font-size:13px;color:var(--txt3);}
+
+    /* DEMO BANNER */
+    .demo-banner{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(13,20,33,0.95);border:1px solid rgba(108,99,255,0.3);border-radius:14px;padding:12px 20px;backdrop-filter:blur(20px);z-index:90;display:flex;align-items:center;gap:16px;box-shadow:0 8px 32px rgba(0,0,0,0.4);white-space:nowrap;}
+    .demo-banner span{font-size:13px;color:var(--txt2);}
+    .demo-pill{background:linear-gradient(135deg,var(--accent),var(--teal));border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;color:#fff;text-decoration:none;transition:all 0.2s;}
+    .demo-pill:hover{transform:scale(1.05);}
+    .demo-banner-close{background:none;border:none;color:var(--txt2);cursor:pointer;font-size:16px;padding:0;line-height:1;}
+
+    @media(max-width:768px){
+      nav{padding:0 20px;} .nav-links{display:none;}
+      section{padding:60px 20px;}
+      .hero{padding:100px 20px 60px;}
+      .process-grid::before{display:none;}
+      .footer-top{grid-template-columns:1fr;gap:32px;}
+      .demo-banner{max-width:90vw;flex-wrap:wrap;justify-content:center;}
+    }
+  </style>
+</head>
+<body>
+  <!-- Nav -->
+  <nav id="navbar">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-mark">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+      </div>
+      <span class="nav-logo-text">LaunchPad</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="/programs">Programs</a></li>
+      <li><a href="/startups-directory">Startups</a></li>
+      <li><a href="/mentors-directory">Mentors</a></li>
+      <li><a href="/events-directory">Events</a></li>
+      <li><a href="/about">About</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="/login" class="btn-nav-ghost" id="navLoginBtn">Sign In</a>
+      <a href="/register" class="btn-nav" id="navDashBtn">Apply Now</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="hero-grid"></div>
+      <div class="hero-orb1"></div>
+      <div class="hero-orb2"></div>
+      <div class="hero-orb3"></div>
+    </div>
+    <div class="hero-inner">
+      <div class="hero-badge">
+        <div class="hero-badge-dot"></div>
+        Now accepting Cohort 2025-A Applications
+      </div>
+      <h1>Build the Future.<br/><span class="h1-grad">Launch Your Startup.</span></h1>
+      <p class="hero-desc">LaunchPad is India's premier online startup incubator. Get mentorship from industry veterans, access funding, connect with investors, and transform your idea into a scalable business.</p>
+      <div class="hero-cta">
+        <a href="/register" class="btn-primary">
+          Apply for Incubation
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <a href="#how-it-works" class="btn-outline">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="10 15 15 12 10 9"/></svg>
+          How it Works
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-num" data-count="350">0</div>
+          <div class="hero-stat-lbl">Startups Incubated</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">₹80Cr+</div>
+          <div class="hero-stat-lbl">Funding Raised</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num" data-count="50">0</div>
+          <div class="hero-stat-lbl">Expert Mentors</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section style="padding-top:60px;">
+    <div class="section-inner">
+      <div class="section-header" style="text-align:center;">
+        <div class="section-tag">Why LaunchPad</div>
+        <h2 class="section-title">Everything you need to<br/>build a fundable startup</h2>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(108,99,255,0.12)">🎓</div>
+          <div class="feature-title">Expert Mentorship</div>
+          <div class="feature-desc">Get paired with industry-specific mentors who've built and scaled startups. Weekly 1-on-1 sessions, milestone reviews, and on-demand guidance.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(0,212,170,0.12)">💰</div>
+          <div class="feature-title">Funding Support</div>
+          <div class="feature-desc">Access grants from ₹5L to ₹50L. We help you apply for government schemes (BIRAC, DST-NIDHI, Startup India) and connect with 100+ investors.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(255,184,48,0.12)">📊</div>
+          <div class="feature-title">Milestone Tracking</div>
+          <div class="feature-desc">Structured 9-month program with 7 curated milestones from idea validation to graduation. Transparent progress tracking and mentor approvals.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(255,122,80,0.12)">🤝</div>
+          <div class="feature-title">Investor Network</div>
+          <div class="feature-desc">Direct introductions to VCs, angel investors, and sector-specific funds. Our demo day connects 30 startups to 200+ investors annually.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(167,139,250,0.12)">⚡</div>
+          <div class="feature-title">Legal & Compliance</div>
+          <div class="feature-desc">Company incorporation, IP protection, term sheet review, and CA support — all included. Navigate the legal landscape without expensive lawyers.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(255,77,106,0.12)">🌐</div>
+          <div class="feature-title">Industry Events</div>
+          <div class="feature-desc">Pitch days, investor meets, hackathons, and networking evenings every month. Build relationships across India's startup ecosystem.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works">
+    <div class="section-inner">
+      <div class="section-header" style="text-align:center;">
+        <div class="section-tag">The Journey</div>
+        <h2 class="section-title">From Application to Graduation</h2>
+        <p class="section-sub" style="margin:0 auto">A structured 9-month journey transforming raw ideas into market-ready startups with global impact.</p>
+      </div>
+      <div class="process-grid">
+        <div class="process-step">
+          <div class="step-num">1</div>
+          <div class="step-title">Apply</div>
+          <div class="step-desc">Submit your application with your idea, team, and vision. Our panel reviews within 2 weeks.</div>
+        </div>
+        <div class="process-step">
+          <div class="step-num">2</div>
+          <div class="step-title">Join Cohort</div>
+          <div class="step-desc">Get accepted, meet your cohort, and get matched with your dedicated mentor.</div>
+        </div>
+        <div class="process-step">
+          <div class="step-num">3</div>
+          <div class="step-title">Build & Iterate</div>
+          <div class="step-desc">Complete 7 structured milestones — from validation to MVP to market testing.</div>
+        </div>
+        <div class="process-step">
+          <div class="step-num">4</div>
+          <div class="step-title">Raise Funding</div>
+          <div class="step-desc">Apply for grants, meet investors, and raise your seed or Series A round.</div>
+        </div>
+        <div class="process-step">
+          <div class="step-num">5</div>
+          <div class="step-title">Graduate 🎓</div>
+          <div class="step-desc">Showcase at Demo Day, graduate with a network, funding, and a fundable business.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STARTUPS SHOWCASE -->
+  <section style="background:rgba(13,20,33,0.5);">
+    <div class="section-inner">
+      <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-end;">
+        <div>
+          <div class="section-tag">Portfolio</div>
+          <h2 class="section-title">Startups in our ecosystem</h2>
+          <p class="section-sub">28 active startups across 8 sectors in Cohort 2024-B</p>
+        </div>
+        <a href="/startups-directory" class="btn-outline" style="white-space:nowrap">View All →</a>
+      </div>
+      <div class="startups-grid" id="startupsList">
+        <!-- Loaded dynamically -->
+        <div class="startup-card">
+          <div class="startup-logo" style="background:linear-gradient(135deg,rgba(108,99,255,0.2),rgba(108,99,255,0.1));color:#A78BFA">NS</div>
+          <div class="startup-name">NovaSphere</div>
+          <div class="startup-tagline">AI-powered insights for modern farmers</div>
+          <div class="startup-tags">
+            <span class="tag tag-purple">AgriTech</span>
+            <span class="tag tag-teal">AI</span>
+          </div>
+          <div class="startup-progress">
+            <div class="prog-label"><span>Cohort 2024-B</span><span>68%</span></div>
+            <div class="prog-track"><div class="prog-fill" style="width:68%"></div></div>
+          </div>
+        </div>
+        <div class="startup-card">
+          <div class="startup-logo" style="background:linear-gradient(135deg,rgba(0,212,170,0.2),rgba(0,212,170,0.1));color:var(--teal)">FE</div>
+          <div class="startup-name">FinEdge</div>
+          <div class="startup-tagline">Democratizing financial planning for India's next billion</div>
+          <div class="startup-tags">
+            <span class="tag tag-teal">FinTech</span>
+            <span class="tag tag-purple">AI</span>
+          </div>
+          <div class="startup-progress">
+            <div class="prog-label"><span>Cohort 2024-B</span><span>82%</span></div>
+            <div class="prog-track"><div class="prog-fill" style="width:82%"></div></div>
+          </div>
+        </div>
+        <div class="startup-card">
+          <div class="startup-logo" style="background:linear-gradient(135deg,rgba(255,122,80,0.2),rgba(255,122,80,0.1));color:var(--orange)">HS</div>
+          <div class="startup-name">HealthSync</div>
+          <div class="startup-tagline">Connecting rural patients to urban specialists</div>
+          <div class="startup-tags">
+            <span class="tag tag-orange">HealthTech</span>
+          </div>
+          <div class="startup-progress">
+            <div class="prog-label"><span>Cohort 2024-B</span><span>45%</span></div>
+            <div class="prog-track"><div class="prog-fill" style="width:45%"></div></div>
+          </div>
+        </div>
+        <div class="startup-card">
+          <div class="startup-logo" style="background:linear-gradient(135deg,rgba(255,184,48,0.2),rgba(255,184,48,0.1));color:var(--gold)">GS</div>
+          <div class="startup-name">GreenSpark</div>
+          <div class="startup-tagline">Solar micro-grids for rural communities</div>
+          <div class="startup-tags">
+            <span class="tag" style="background:rgba(255,184,48,0.12);color:var(--gold)">CleanTech</span>
+          </div>
+          <div class="startup-progress">
+            <div class="prog-label"><span>Cohort 2024-B</span><span>55%</span></div>
+            <div class="prog-track"><div class="prog-fill" style="width:55%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats-section">
+    <div class="section-inner">
+      <div class="stats-grid">
+        <div>
+          <div class="stat-num" data-count="350">350+</div>
+          <div class="stat-lbl">Startups Incubated</div>
+        </div>
+        <div>
+          <div class="stat-num">₹80Cr+</div>
+          <div class="stat-lbl">Total Funding Raised</div>
+        </div>
+        <div>
+          <div class="stat-num" data-count="50">50+</div>
+          <div class="stat-lbl">Expert Mentors</div>
+        </div>
+        <div>
+          <div class="stat-num" data-count="120">120+</div>
+          <div class="stat-lbl">Investor Partners</div>
+        </div>
+        <div>
+          <div class="stat-num">14</div>
+          <div class="stat-lbl">Cohorts Completed</div>
+        </div>
+        <div>
+          <div class="stat-num">78%</div>
+          <div class="stat-lbl">Graduation Rate</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MENTORS -->
+  <section>
+    <div class="section-inner">
+      <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-end;">
+        <div>
+          <div class="section-tag">Our Mentors</div>
+          <h2 class="section-title">Learn from industry veterans</h2>
+          <p class="section-sub">50+ mentors from Google, Razorpay, Zomato, and top IITs mentoring our cohort startups.</p>
+        </div>
+        <a href="/mentors-directory" class="btn-outline" style="white-space:nowrap">View All →</a>
+      </div>
+      <div class="mentors-grid">
+        <div class="mentor-card">
+          <div class="mentor-av" style="background:rgba(108,99,255,0.12);color:#A78BFA">RM</div>
+          <div class="stars">★★★★★</div>
+          <div class="mentor-name">Dr. Rahul Mehta</div>
+          <div class="mentor-role">Startup Strategy & Product Growth · 12+ yrs</div>
+          <div class="mentor-tags">
+            <span class="tag tag-purple">AgriTech</span>
+            <span class="tag tag-purple">Fundraising</span>
+          </div>
+        </div>
+        <div class="mentor-card">
+          <div class="mentor-av" style="background:rgba(0,212,170,0.12);color:var(--teal)">PS</div>
+          <div class="stars">★★★★★</div>
+          <div class="mentor-name">Priya Sharma</div>
+          <div class="mentor-role">FinTech & Product Management · 9+ yrs</div>
+          <div class="mentor-tags">
+            <span class="tag tag-teal">FinTech</span>
+            <span class="tag tag-teal">PMF</span>
+          </div>
+        </div>
+        <div class="mentor-card">
+          <div class="mentor-av" style="background:rgba(255,184,48,0.12);color:var(--gold)">AK</div>
+          <div class="stars">★★★★★</div>
+          <div class="mentor-name">Arun Krishnan</div>
+          <div class="mentor-role">HealthTech & Operations · 15+ yrs</div>
+          <div class="mentor-tags">
+            <span class="tag tag-orange">HealthTech</span>
+            <span class="tag tag-orange">Ops</span>
+          </div>
+        </div>
+        <div class="mentor-card">
+          <div class="mentor-av" style="background:rgba(167,139,250,0.12);color:#C4B5FD">VB</div>
+          <div class="stars">★★★★★</div>
+          <div class="mentor-name">Vikrant Bose</div>
+          <div class="mentor-role">Deep Tech & AI · 11+ yrs</div>
+          <div class="mentor-tags">
+            <span class="tag tag-purple">AI/ML</span>
+            <span class="tag tag-purple">DeepTech</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="section-inner">
+      <div class="cta-card">
+        <div class="section-tag">Get Started Today</div>
+        <h2 class="cta-title">Ready to build something<br/>remarkable?</h2>
+        <p class="cta-sub">Join 350+ founders who used LaunchPad to go from idea to funded startup. Applications for Cohort 2025-A are open.</p>
+        <div class="cta-btns">
+          <a href="/register" class="btn-primary">Apply for Incubation →</a>
+          <a href="/login" class="btn-outline">Sign In to Dashboard</a>
+        </div>
+        <div class="cta-roles">
+          <a href="/register?role=startup" class="cta-role">
+            <div class="cta-role-icon">🚀</div>
+            <div class="cta-role-name">Founder</div>
+            <div class="cta-role-desc">Apply for incubation</div>
+          </a>
+          <a href="/register?role=mentor" class="cta-role">
+            <div class="cta-role-icon">🎓</div>
+            <div class="cta-role-name">Mentor</div>
+            <div class="cta-role-desc">Guide the next wave</div>
+          </a>
+          <a href="/register?role=investor" class="cta-role">
+            <div class="cta-role-icon">💼</div>
+            <div class="cta-role-name">Investor</div>
+            <div class="cta-role-desc">Discover top startups</div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--teal));display:flex;align-items:center;justify-content:center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="white" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;">LaunchPad</span>
+          </div>
+          <p>India's premier online startup incubator platform. Empowering founders from idea to impact.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <a href="/programs">Programs</a>
+          <a href="/startups">Startup Directory</a>
+          <a href="/mentors">Mentor Network</a>
+          <a href="/events">Events</a>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <a href="/about">About Us</a>
+          <a href="/contact">Contact</a>
+        </div>
+        <div class="footer-col">
+          <h4>Account</h4>
+          <a href="/login">Sign In</a>
+          <a href="/register">Register</a>
+          <a href="/dashboard">Dashboard</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 LaunchPad Incubator. All rights reserved.</span>
+        <span>Built for India's next generation of founders</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Demo Banner -->
+  <div class="demo-banner" id="demoBanner">
+    <span>🚀 Try the platform instantly</span>
+    <a href="/login" class="demo-pill">startup@launchpad.demo / Demo@2024</a>
+    <button class="demo-banner-close" onclick="document.getElementById('demoBanner').style.display='none'">×</button>
+  </div>
+
+  <script>
+    // Nav scroll effect
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // Counter animation
+    function animateCount(el, target, duration = 2000) {
+      const start = 0;
+      const step = target / (duration / 16);
+      let current = start;
+      const timer = setInterval(() => {
+        current = Math.min(current + step, target);
+        el.textContent = Math.floor(current) + (el.dataset.suffix || '+');
+        if (current >= target) clearInterval(timer);
+      }, 16);
+    }
+
+    // IntersectionObserver for counter
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !entry.target.dataset.animated) {
+          entry.target.dataset.animated = '1';
+          const target = parseInt(entry.target.dataset.count);
+          if (target) animateCount(entry.target, target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('[data-count]').forEach(el => counterObserver.observe(el));
+
+    // Update nav if logged in
+    if (Api.isLoggedIn()) {
+      const user = Api.getUser();
+      document.getElementById('navLoginBtn').textContent = 'Dashboard';
+      document.getElementById('navLoginBtn').href = '/dashboard/' + (user?.role || '');
+      document.getElementById('navDashBtn').textContent = 'My Dashboard';
+      document.getElementById('navDashBtn').href = '/dashboard/' + (user?.role || '');
+    }
+  </script>
+</body>
+</html>

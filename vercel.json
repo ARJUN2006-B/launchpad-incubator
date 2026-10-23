@@ -1,7 +1,14 @@
 {
   "version": 2,
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "db/**,launchpad.db,public/**,dashboards/**,routes/**"
+    }
+  },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/index.js" },
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/index.html", "destination": "/index.html" },
     { "source": "/dashboard", "destination": "/dashboards/startup/index.html" },
     { "source": "/dashboard/startup", "destination": "/dashboards/startup/index.html" },
     { "source": "/dashboard/mentor", "destination": "/dashboards/mentor/index.html" },
@@ -14,6 +21,7 @@
     { "source": "/startups", "destination": "/public/startups.html" },
     { "source": "/mentors", "destination": "/public/mentors.html" },
     { "source": "/events", "destination": "/public/events.html" },
-    { "source": "/contact", "destination": "/public/contact.html" }
+    { "source": "/contact", "destination": "/public/contact.html" },
+    { "source": "/js/(.*)", "destination": "/public/js/$1" }
   ]
 }

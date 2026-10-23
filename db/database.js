@@ -1,11 +1,33 @@
 /* ============================================================
    db/database.js — SQLite Database Layer (using sql.js)
    Serverless-compatible (Vercel / Lambda) + Local Persistent
+   Includes embedded WebAssembly binary to eliminate filesystem dependencies
 ============================================================ */
 const initSqlJs = require('sql.js');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+
+// Load embedded WebAssembly binary (zero external filesystem dependency)
+let wasmBinary = null;
+try {
+  wasmBinary = require('./wasm-binary');
+} catch (err) {
+  const possiblePaths = [
+    path.join(__dirname, 'sql-wasm.wasm'),
+    path.join(__dirname, '..', 'api', 'sql-wasm.wasm'),
+    path.join(process.cwd(), 'db', 'sql-wasm.wasm'),
+    path.join(__dirname, '..', 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm')
+  ];
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) {
+      try {
+        wasmBinary = fs.readFileSync(p);
+        break;
+      } catch (e) {}
+    }
+  }
+}
 
 const isServerless = !!(
   process.env.VERCEL ||
@@ -34,7 +56,8 @@ async function initDB() {
 
   initPromise = (async () => {
     try {
-      const SQL = await initSqlJs();
+      // Initialize sql.js using in-memory wasmBinary for 100% reliability
+      const SQL = await initSqlJs(wasmBinary ? { wasmBinary } : {});
 
       if (isServerless) {
         // If /tmp/launchpad.db already exists, load from /tmp
@@ -45,9 +68,13 @@ async function initDB() {
         } else if (fs.existsSync(BUNDLED_DB_PATH)) {
           // Copy bundled DB into /tmp so future writes succeed
           const fileBuffer = fs.readFileSync(BUNDLED_DB_PATH);
-          fs.writeFileSync(ACTIVE_DB_PATH, fileBuffer);
+          try {
+            fs.writeFileSync(ACTIVE_DB_PATH, fileBuffer);
+          } catch (writeErr) {
+            console.warn('⚠️ Could not copy DB to /tmp, using in-memory buffer:', writeErr.message);
+          }
           db = new SQL.Database(fileBuffer);
-          console.log(`✅ Copied bundled database to serverless storage (${ACTIVE_DB_PATH})`);
+          console.log(`✅ Loaded bundled database (${BUNDLED_DB_PATH})`);
         } else {
           // Initialize fresh schema
           db = new SQL.Database();
@@ -57,7 +84,7 @@ async function initDB() {
             db.run(schema);
           }
           saveDB();
-          console.log('✅ Created fresh database from schema in serverless storage');
+          console.log('✅ Created fresh database from schema');
         }
       } else {
         // Local environment

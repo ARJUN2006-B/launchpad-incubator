@@ -57,22 +57,27 @@ app.use(express.static(__dirname));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ── API Routes (modular routers) ──
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/startups', require('./routes/startups'));
-app.use('/api/milestones', require('./routes/milestones'));
-app.use('/api/meetings', require('./routes/meetings'));
-app.use('/api/funding', require('./routes/funding'));
-app.use('/api/events', require('./routes/events'));
-app.use('/api/notifications', require('./routes/notifications'));
-app.use('/api/messages', require('./routes/messages'));
-app.use('/api/mentor', require('./routes/mentor'));
-app.use('/api/investors', require('./routes/investors'));
-app.use('/api/applications', require('./routes/applications'));
-app.use('/api/documents', require('./routes/documents'));
-app.use('/api/admin', require('./routes/admin'));
+const mountApiRoutes = (prefix) => {
+  app.use(`${prefix}/auth`, require('./routes/auth'));
+  app.use(`${prefix}/startups`, require('./routes/startups'));
+  app.use(`${prefix}/milestones`, require('./routes/milestones'));
+  app.use(`${prefix}/meetings`, require('./routes/meetings'));
+  app.use(`${prefix}/funding`, require('./routes/funding'));
+  app.use(`${prefix}/events`, require('./routes/events'));
+  app.use(`${prefix}/notifications`, require('./routes/notifications'));
+  app.use(`${prefix}/messages`, require('./routes/messages'));
+  app.use(`${prefix}/mentor`, require('./routes/mentor'));
+  app.use(`${prefix}/investors`, require('./routes/investors'));
+  app.use(`${prefix}/applications`, require('./routes/applications'));
+  app.use(`${prefix}/documents`, require('./routes/documents'));
+  app.use(`${prefix}/admin`, require('./routes/admin'));
+};
+
+mountApiRoutes('/api');
+mountApiRoutes('');
 
 // ── Global Search ──
-app.get('/api/search', (req, res) => {
+app.get(['/api/search', '/search'], (req, res) => {
   const { q } = req.query;
   if (!q || q.length < 2) return res.json({ results: {} });
   const { dbWrapper } = require('./db/database');
@@ -83,7 +88,7 @@ app.get('/api/search', (req, res) => {
 });
 
 // ── Health Check & DB Status ──
-app.get('/api/health', (req, res) => {
+app.get(['/api/health', '/health'], (req, res) => {
   res.json({
     status: 'ok',
     version: '1.0.0',
@@ -94,7 +99,7 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-app.get('/api/db-status', (req, res) => {
+app.get(['/api/db-status', '/db-status'], (req, res) => {
   res.json(getDbStatus());
 });
 
