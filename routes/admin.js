@@ -1,7 +1,7 @@
 /* api/admin.js — Admin management routes */
 const express = require('express');
 const router = express.Router();
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID: uuidv4 } = require('crypto');
 const { requireRole } = require('../middleware/auth');
 const { dbWrapper } = require('../db/database');
 

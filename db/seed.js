@@ -3,7 +3,7 @@
    Creates realistic Indian startup ecosystem demo accounts
 ============================================================ */
 const bcrypt = require('bcryptjs');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID: uuidv4 } = require('crypto');
 const { dbWrapper } = require('./database');
 
 const DEMO_PASSWORD_HASH = bcrypt.hashSync('Demo@2024', 10);

@@ -1,7 +1,7 @@
 /* api/startups.js — Startup CRUD routes */
 const express = require('express');
 const router = express.Router();
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID: uuidv4 } = require('crypto');
 const auth = require('../middleware/auth');
 const { requireRole } = require('../middleware/auth');
 const { dbWrapper } = require('../db/database');

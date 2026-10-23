@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID: uuidv4 } = require('crypto');
 const { dbWrapper } = require('../db/database');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'launchpad_secret';

@@ -1,7 +1,7 @@
 /* api/documents.js — Document management */
 const express = require('express');
 const router = express.Router();
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID: uuidv4 } = require('crypto');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
