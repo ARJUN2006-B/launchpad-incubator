@@ -5,6 +5,12 @@ const { randomUUID: uuidv4 } = require('crypto');
 const auth = require('../middleware/auth');
 const { dbWrapper } = require('../db/database');
 
+// GET /api/applications/programs
+router.get('/programs', (req, res) => {
+  const programs = dbWrapper.all('SELECT * FROM incubation_programs WHERE is_active = 1 ORDER BY created_at ASC');
+  res.json({ programs });
+});
+
 // GET /api/applications/my
 router.get('/my', auth, (req, res) => {
   const startup = dbWrapper.get('SELECT id FROM startups WHERE user_id = ?', [req.user.id]);

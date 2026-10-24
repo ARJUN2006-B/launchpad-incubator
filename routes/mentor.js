@@ -123,7 +123,9 @@ router.post('/evaluations', ...requireRole('mentor'), (req, res) => {
 // GET /api/mentor/all — Public mentor list
 router.get('/all', (req, res) => {
   const mentors = dbWrapper.all(
-    `SELECT m.*, COALESCE(u.email, '') as email FROM mentors m LEFT JOIN users u ON m.user_id = u.id WHERE m.is_verified = 1 ORDER BY m.rating DESC`
+    `SELECT m.*, COALESCE(u.email, '') as email,
+     (SELECT COUNT(*) FROM mentor_assignments ma WHERE ma.mentor_id = m.id AND ma.is_active = 1) as assigned_count
+     FROM mentors m LEFT JOIN users u ON m.user_id = u.id WHERE m.is_verified = 1 ORDER BY m.rating DESC`
   );
   res.json({ mentors });
 });

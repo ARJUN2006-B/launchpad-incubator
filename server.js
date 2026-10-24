@@ -70,6 +70,7 @@ const mountApiRoutes = (prefix) => {
   app.use(`${prefix}/investors`, require('./routes/investors'));
   app.use(`${prefix}/applications`, require('./routes/applications'));
   app.use(`${prefix}/documents`, require('./routes/documents'));
+  app.use(`${prefix}/programs`, require('./routes/programs'));
   app.use(`${prefix}/admin`, require('./routes/admin'));
 };
 

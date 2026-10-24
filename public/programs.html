@@ -263,7 +263,14 @@
         if (!programs || programs.length === 0) return;
         const grid = document.getElementById('programsGrid');
         const gradients = ['linear-gradient(90deg,#6C63FF,#A78BFA)','linear-gradient(90deg,#00D4AA,#6C63FF)','linear-gradient(90deg,#FFB830,#FF7A50)','linear-gradient(90deg,#FF4D6A,#FFB830)'];
-        grid.innerHTML = programs.map((p, i) => `
+        grid.innerHTML = programs.map((p, i) => {
+          let feats = [];
+          try {
+            feats = Array.isArray(p.features) ? p.features : JSON.parse(p.features || '[]');
+          } catch(e) {
+            try { feats = p.benefits ? (Array.isArray(p.benefits) ? p.benefits : JSON.parse(p.benefits)) : []; } catch(e2) { feats = []; }
+          }
+          return `
           <div class="card">
             <div class="card-accent" style="background:${gradients[i % gradients.length]}"></div>
             <div class="prog-icon">${p.emoji || '🚀'}</div>
@@ -272,17 +279,17 @@
             <div class="prog-meta">
               <span class="tag tag-accent">${p.duration || ''}</span>
               ${p.equity_terms ? `<span class="tag tag-orange">${p.equity_terms}</span>` : ''}
-              ${p.funding_amount ? `<span class="tag tag-teal">₹${p.funding_amount}</span>` : ''}
+              ${p.funding_amount ? `<span class="tag tag-teal">${p.funding_amount.startsWith('₹') ? '' : '₹'}${p.funding_amount}</span>` : ''}
             </div>
             <ul class="prog-features">
-              ${(JSON.parse(p.features || '[]')).map(f => `<li>${f}</li>`).join('')}
+              ${feats.map(f => `<li>${f}</li>`).join('')}
             </ul>
             <div class="prog-cta">
               <div class="prog-deadline">Applications: <strong>${p.application_deadline || 'Rolling'}</strong></div>
               <a href="/register" class="btn-primary" style="font-size:12px;padding:8px 16px">Apply →</a>
             </div>
           </div>
-        `).join('');
+        `;}).join('');
       } catch(e) { /* use static content */ }
     })();
   </script>

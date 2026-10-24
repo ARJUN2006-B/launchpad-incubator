@@ -68,7 +68,7 @@ const Api = {
   getMyApplication: () => Api.get('/applications/my'),
   saveApplication: (data) => Api.post('/applications', data),
   submitApplication: (id) => Api.post(`/applications/${id}/submit`),
-  getPrograms: () => Api.get('/applications/programs'),
+  getPrograms: () => Api.get('/programs'),
 
   // ── Milestones ──
   getMilestones: () => Api.get('/milestones'),

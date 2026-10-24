@@ -69,6 +69,11 @@ CREATE TABLE IF NOT EXISTS incubation_programs (
   current_startups INTEGER DEFAULT 0,
   is_active INTEGER DEFAULT 1,
   cohort TEXT,
+  tagline TEXT,
+  equity_terms TEXT,
+  funding_amount TEXT,
+  emoji TEXT,
+  features TEXT,
   created_at TEXT DEFAULT (datetime('now'))
 );
 
