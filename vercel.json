@@ -22,6 +22,11 @@
     { "source": "/mentors", "destination": "/public/mentors.html" },
     { "source": "/events", "destination": "/public/events.html" },
     { "source": "/contact", "destination": "/public/contact.html" },
+    { "source": "/data.js", "destination": "/public/data.js" },
+    { "source": "/pages-1.js", "destination": "/public/pages-1.js" },
+    { "source": "/pages-2.js", "destination": "/public/pages-2.js" },
+    { "source": "/app.js", "destination": "/public/app.js" },
+    { "source": "/dashboard.html", "destination": "/dashboards/startup/index.html" },
     { "source": "/js/(.*)", "destination": "/public/js/$1" }
   ]
 }
